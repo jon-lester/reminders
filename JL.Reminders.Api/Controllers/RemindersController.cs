@@ -13,8 +13,9 @@ using JL.Reminders.Core.Repositories;
 
 namespace JL.Reminders.Api.Controllers
 {
-    [Produces("application/json")]
-    [Route("api/reminders")]
+	[ApiController]
+	[Produces("application/json")]
+    [Route("api/[controller]")]
     public class RemindersController : Controller
     {
 	    private readonly IRemindersRepository remindersRepository;
@@ -31,8 +32,7 @@ namespace JL.Reminders.Api.Controllers
 		[HttpGet]
 		public async Task<IActionResult> GetAllReminders()
 		{
-			var reminders = await this.remindersRepository
-				.GetRemindersByUserIdAsync(1);
+			var reminders = await this.remindersRepository.GetRemindersByUserIdAsync(1);
 
 			return Ok(reminders);
 		}
@@ -46,8 +46,7 @@ namespace JL.Reminders.Api.Controllers
 	    [Route("{id}")]
 		public async Task<IActionResult> GetReminder(long id)
 	    {
-			var reminder = await this.remindersRepository
-				.GetReminderByIdAsync(1, id);
+			var reminder = await this.remindersRepository.GetReminderByIdAsync(1, id);
 
 		    if (reminder == null)
 		    {
@@ -65,16 +64,9 @@ namespace JL.Reminders.Api.Controllers
 	    [HttpPost]
 	    public async Task<IActionResult> PostReminder([FromBody] ReminderDetailsModel reminder)
 	    {
-		    if (!ModelState.IsValid)
-		    {
-			    return BadRequest();
-			}
-
-		    var reminderId = await this.remindersRepository
-			    .AddReminderAsync(1, Mapper.Map<Reminder>(reminder));
+			var reminderId = await this.remindersRepository.AddReminderAsync(1, Mapper.Map<Reminder>(reminder));
 
 		    return Created($"{Request.Path.ToString()}/{reminderId}", null);
-
 		}
 
 		/// <summary>
@@ -87,16 +79,10 @@ namespace JL.Reminders.Api.Controllers
 		[Route("{id}")]
 	    public async Task<IActionResult> UpdateReminder(int id, [FromBody] ReminderDetailsModel reminder)
 	    {
-		    if (!ModelState.IsValid)
-		    {
-			    return BadRequest();
-		    }
+		    var obj = Mapper.Map<Reminder>(reminder);
+		    obj.ID = id;
 
-		    var dto = Mapper.Map<Reminder>(reminder);
-		    dto.ID = id;
-
-			var success = await this.remindersRepository
-			    .UpdateReminderAsync(1, dto);
+			var success = await this.remindersRepository.UpdateReminderAsync(1, obj);
 
 		    if (!success)
 		    {
@@ -115,8 +101,7 @@ namespace JL.Reminders.Api.Controllers
 	    [Route("id")]
 	    public async Task<IActionResult> DeleteReminder(long id)
 	    {
-		    var success = await this.remindersRepository
-			    .DeleteReminderAsync(1, id);
+		    var success = await this.remindersRepository.DeleteReminderAsync(1, id);
 
 		    if (!success)
 		    {

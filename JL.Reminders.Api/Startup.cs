@@ -2,18 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
-using JL.Reminders.Api.Models;
-using JL.Reminders.Core.Model;
-using JL.Reminders.Core.Repositories;
-using JL.Reminders.Data;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Mvc;
+
+using AutoMapper;
 using Swashbuckle.AspNetCore.Swagger;
+using FluentValidation.AspNetCore;
+
+using JL.Reminders.Api.Models;
+using JL.Reminders.Core.Model;
+using JL.Reminders.Core.Repositories;
+using JL.Reminders.Data;
 
 namespace JL.Reminders.Api
 {
@@ -29,10 +34,14 @@ namespace JL.Reminders.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+	        services.AddMvc(mvcOptions =>
+		        {
+		        })
+		        .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+		        .AddFluentValidation(vc => vc.RegisterValidatorsFromAssemblyContaining<Startup>());
 
-	        services.AddSingleton<IConnectionStringFactory, ConnectionStringFactory>();
-	        services.AddSingleton<IRemindersRepository, RemindersRepository>();
+			services.AddRemindersApp();
+
 	        services.AddSwaggerGen(c =>
 	        {
 		        c.SwaggerDoc("v1", new Info()
@@ -40,8 +49,9 @@ namespace JL.Reminders.Api
 			        Title = "Reminders API",
 			        Description = "WebAPI for the Reminders app"
 		        });
-		        c.IncludeXmlComments(string.Format(@"{0}\JL.Reminders.Api.XML", System.AppDomain.CurrentDomain.BaseDirectory));
-			});
+		        // turn this on later when everything is xml-doc'd to avoid annoying missing-xmldoc whinging
+		        // c.IncludeXmlComments(string.Format(@"{0}\JL.Reminders.Api.XML", System.AppDomain.CurrentDomain.BaseDirectory));
+	        });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,9 +60,9 @@ namespace JL.Reminders.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-	            app.UseSwagger(c =>
-	            {
-	            });
+
+	            app.UseSwagger();
+
 	            app.UseSwaggerUI(c =>
 	            {
 		            c.SwaggerEndpoint("/swagger/v1/swagger.json", "Reminders v1");
@@ -72,4 +82,13 @@ namespace JL.Reminders.Api
 		    });
 		}
     }
+
+	public static class ServiceExtensions
+	{
+		public static void AddRemindersApp(this IServiceCollection serviceCollection)
+		{
+			serviceCollection.AddSingleton<IConnectionStringFactory, ConnectionStringFactory>();
+			serviceCollection.AddSingleton<IRemindersRepository, RemindersRepository>();
+		}
+	}
 }
