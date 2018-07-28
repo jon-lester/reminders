@@ -8,6 +8,11 @@ namespace JL.Reminders.Core.Model
 		public string Title { get; set; }
 		public string Description { get; set; }
 	    public DateTime ForDate { get; set; }
+
+		/// <summary>
+		/// TODO: set this from a RemindersService
+		/// </summary>
+		public int DaysToGo { get; set; }
 		public DateTime Created { get; set; }
 		public Recurrence Recurrence { get; set; }
 		public Importance Importance { get; set; }

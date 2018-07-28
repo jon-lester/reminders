@@ -69,6 +69,8 @@ namespace JL.Reminders.Api
 				});
 			}
 
+	        app.UseCors(configurePolicy => { configurePolicy.AllowAnyOrigin(); });
+
 	        app.UseMvc();
 
 			ConfigureAutoMapper();
