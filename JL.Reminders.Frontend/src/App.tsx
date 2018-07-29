@@ -1,9 +1,9 @@
-import * as Mui from '@material-ui/core/';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import * as React from 'react';
-import './App.css';
 
+import ReminderAppMenuBar from './components/ReminderAppMenuBar';
 import ReminderCardContainer from './components/ReminderCardContainer';
+
 import IReminder from './interfaces/IReminder';
 
 export interface IAppState {
@@ -22,12 +22,8 @@ class App extends React.Component<any, IAppState> {
     public render() {
         return (
             <React.Fragment>
-                <Mui.AppBar>
-                    <Mui.Toolbar color="white">
-                        <Mui.Typography variant="title" color="inherit">Reminders</Mui.Typography>
-                    </Mui.Toolbar>
-                </Mui.AppBar>
                 <CssBaseline />
+                <ReminderAppMenuBar />
                 <ReminderCardContainer reminders={this.state.reminders} />
             </React.Fragment>
         );
