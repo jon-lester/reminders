@@ -24,7 +24,7 @@ class ReminderCardContainer extends React.Component<IReminderCardContainerProps>
         for(const reminder of this.props.reminders) {
             cards.push(
                 <Mui.Grid key={reminder.id} item={item}>
-                    <ReminderCard reminder={reminder} />
+                    <ReminderCard onMarkActioned={this.onMarkActionedHandler} reminder={reminder} />
                 </Mui.Grid>
             );
         }
@@ -33,6 +33,10 @@ class ReminderCardContainer extends React.Component<IReminderCardContainerProps>
             <div style={{ padding: 12, marginTop: 72 }}>
                 <Mui.Grid container={container} spacing={24}>{cards}</Mui.Grid>
             </div>);
+    }
+
+    private readonly onMarkActionedHandler = (reminderId: number) => {
+        console.log('OnMarkActioned: ' + reminderId);
     }
 }
 

@@ -3,9 +3,9 @@ import * as React from 'react';
 
 import IReminder from '../interfaces/IReminder';
 
-
 export interface IReminderCardProps {
-    reminder: IReminder
+    onMarkActioned: (reminderId: number) => void,
+    reminder: IReminder,
 }
 
 class ReminderCard extends React.Component<IReminderCardProps> {
@@ -45,11 +45,16 @@ class ReminderCard extends React.Component<IReminderCardProps> {
                     </Mui.Typography>
                 </Mui.CardContent>
                 <Mui.CardActions>
-                    <Mui.Button>
+                    <Mui.Button onClick={this.markActionedClickHandler}>
                         Mark Actioned
                     </Mui.Button>
                 </Mui.CardActions>
-            </Mui.Card>);
+            </Mui.Card>
+        );
+    }
+
+    private readonly markActionedClickHandler = () => {
+        this.props.onMarkActioned(this.props.reminder.id);
     }
 }
 
