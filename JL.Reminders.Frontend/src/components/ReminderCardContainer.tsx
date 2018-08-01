@@ -5,7 +5,8 @@ import IReminder from '../interfaces/IReminder';
 import ReminderCard from './ReminderCard';
 
 export interface IReminderCardContainerProps {
-    reminders: IReminder[]
+    reminders: IReminder[],
+    onMarkActioned?: (reminder: IReminder) => void
 }
 
 class ReminderCardContainer extends React.Component<IReminderCardContainerProps> {
@@ -32,11 +33,14 @@ class ReminderCardContainer extends React.Component<IReminderCardContainerProps>
         return (
             <div style={{ padding: 12, marginTop: 72 }}>
                 <Mui.Grid container={container} spacing={24}>{cards}</Mui.Grid>
-            </div>);
+            </div>
+        );
     }
 
-    private readonly onMarkActionedHandler = (reminderId: number) => {
-        console.log('OnMarkActioned: ' + reminderId);
+    private readonly onMarkActionedHandler = (reminder: IReminder) => {
+        if (this.props.onMarkActioned) {
+            this.props.onMarkActioned(reminder);
+        }
     }
 }
 

@@ -4,7 +4,7 @@ import * as React from 'react';
 import IReminder from '../interfaces/IReminder';
 
 export interface IReminderCardProps {
-    onMarkActioned: (reminderId: number) => void,
+    onMarkActioned: (reminder: IReminder) => void,
     reminder: IReminder,
 }
 
@@ -54,7 +54,7 @@ class ReminderCard extends React.Component<IReminderCardProps> {
     }
 
     private readonly markActionedClickHandler = () => {
-        this.props.onMarkActioned(this.props.reminder.id);
+        this.props.onMarkActioned(this.props.reminder);
     }
 }
 
