@@ -1,8 +1,9 @@
 import * as Mui from '@material-ui/core/';
 import * as React from 'react';
 
-import IReminder from '../interfaces/IReminder';
 import ReminderCard from './ReminderCard';
+
+import IReminder from '../interfaces/IReminder';
 
 export interface IReminderCardContainerProps {
     reminders: IReminder[],
