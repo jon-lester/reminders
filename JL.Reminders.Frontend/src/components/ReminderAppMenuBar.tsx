@@ -2,6 +2,7 @@ import * as Mui from '@material-ui/core/';
 import { withStyles } from '@material-ui/core/styles';
 import MenuIcon from '@material-ui/icons/Menu';
 import * as React from 'react';
+
 import ReminderAppMenu from './ReminderAppMenu';
 
 import IMenuItem from '../model/IMenuItem';
@@ -48,7 +49,7 @@ class ReminderAppMenuBar extends React.Component<IReminderAppMenuBarProps, IRemi
                     className={this.props.classes.menuButton}
                     color="inherit"
                     aria-label="Menu"
-                    onClick={this.openMenu}
+                    onClick={this.handleOpenMenuClick}
                     >
                     <MenuIcon />
                 </Mui.IconButton>
@@ -63,20 +64,27 @@ class ReminderAppMenuBar extends React.Component<IReminderAppMenuBarProps, IRemi
                     anchorEl={this.state.anchorEl}
                     menuItems={this.props.menuItems}
                     open={this.state.menuOpen}
-                    onClosed={this.closeMenu}
+                    onClosed={this.handleMenuOnClose}
                 />
             </Mui.AppBar>
         );
     }
 
-    private readonly openMenu = (event: React.SyntheticEvent<HTMLElement>) => {
+    /**
+     * Handle the user having clicked the menu button to
+     * open the menu.
+     */
+    private readonly handleOpenMenuClick = (event: React.SyntheticEvent<HTMLElement>) => {
         this.setState({
             anchorEl: event.currentTarget,
             menuOpen: true
         });
     }
 
-    private readonly closeMenu = () => {
+    /**
+     * Handle the currently-open menu needing to close.
+     */
+    private readonly handleMenuOnClose = () => {
         this.setState({
             anchorEl: undefined,
             menuOpen: false

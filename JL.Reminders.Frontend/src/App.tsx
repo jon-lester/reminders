@@ -3,7 +3,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import Typography from '@material-ui/core/Typography';
 import * as React from 'react';
 
-import AddReminderDialogComponent from './components/AddReminderDialog';
+import AddReminderModal from './components/AddReminderModal';
 import ReminderAppMenuBar from './components/ReminderAppMenuBar';
 import ReminderCardContainer from './components/ReminderCardContainer';
 
@@ -31,9 +31,15 @@ class App extends React.Component<any, IAppState> {
             snackbarOpen: false
         };
 
+        // set up items for the main menu.
         this.menuItems = [
             {
-                action: this.handleAddNew,
+                action: () => {
+                    this.setState({
+                        ...this.state,
+                        addDialogOpen: true
+                    })
+                },
                 id: 1,
                 text: 'Add new reminder'
             }, {
@@ -51,8 +57,9 @@ class App extends React.Component<any, IAppState> {
                 <ReminderCardContainer
                     reminders={this.state.reminders}
                     onMarkActioned={this.handleMarkActioned}
+                    onMarkArchived={this.handleMarkArchived}
                 />
-                <AddReminderDialogComponent
+                <AddReminderModal
                     onClose={this.handleAddReminderDialogClosed}
                     onSave={this.handleAddReminderDialogSave}
                     open={this.state.addDialogOpen} />
@@ -66,6 +73,9 @@ class App extends React.Component<any, IAppState> {
         );
     }
 
+    /**
+     * When the app component mounts, load all reminders from the API.
+     */
     public componentDidMount() {
         const uri = 'https://2d410672-d82b-4642-918f-d96db1e140e1.mock.pstmn.io/api/reminders/';
         // const uri = 'http://localhost:49900/api/reminders/';
@@ -79,39 +89,55 @@ class App extends React.Component<any, IAppState> {
             });
     }
 
-    private handleSnackbarClosed = () => {
+    /**
+     * Handle the snackbar toast requesting that it be closed.
+     */
+    private readonly handleSnackbarClosed = () => {
         this.setState({
             ...this.state,
-            snackbarMessage: undefined,
             snackbarOpen: false
         });
     }
 
-    private handleAddReminderDialogClosed = () => {
+    /**
+     * Handle the add-reminder modal requesting that it be closed.
+     */
+    private readonly handleAddReminderDialogClosed = () => {
         this.setState({
             ...this.state,
             addDialogOpen: false
         });
     }
 
-    private handleAddReminderDialogSave = (saveRequest: IAddReminderRequest) => {
-        console.log(saveRequest);
+    /**
+     * Handle the user having requested to save a new reminder.
+     */
+    private readonly handleAddReminderDialogSave = (saveRequest: IAddReminderRequest) => {
+        // TODO - save reminder
         this.handleAddReminderDialogClosed();
     }
 
-    private handleMarkActioned = (reminder: IReminder) => {
+    /**
+     * Handle the user having requested to mark an existing reminder as actioned.
+     */
+    private readonly handleMarkActioned = (reminder: IReminder) =>
+        this.showToast(`${reminder.title} was marked as actioned.`);
+
+    /**
+     * Handle the user having requested to archive an existing reminder.
+     */
+    private readonly handleMarkArchived = (reminder: IReminder) =>
+        this.showToast(`${reminder.title} was archived.`);
+
+    /**
+     * Show a toast message via the SnackBar component.
+     */
+    private readonly showToast = (message: string) => {
         this.setState({
             ...this.state,
-            snackbarMessage: `Reminder "${reminder.title}" was marked as actioned.`,
+            snackbarMessage: message,
             snackbarOpen: true
         });
-    }
-
-    private handleAddNew = () => {
-        this.setState({
-            ...this.state,
-            addDialogOpen: true
-        })
     }
 }
 

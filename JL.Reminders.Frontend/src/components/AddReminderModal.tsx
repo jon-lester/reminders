@@ -10,7 +10,7 @@ interface IAddReminderDialogComponentProps {
     onSave(addReminderRequest: IAddReminderRequest): void;
 }
 
-class AddReminderDialogComponent extends React.Component<IAddReminderDialogComponentProps, IAddReminderRequest> {
+class AddReminderModal extends React.Component<IAddReminderDialogComponentProps, IAddReminderRequest> {
 
     constructor(props: any) {
         super(props);
@@ -30,7 +30,7 @@ class AddReminderDialogComponent extends React.Component<IAddReminderDialogCompo
                 disableBackdropClick={true}
                 disableEscapeKeyDown={true}
                 open={this.props.open}
-                onClose={this.handleOnClose}>
+                onClose={this.props.onClose}>
                 <Mui.DialogTitle>Add Reminder</Mui.DialogTitle>
                 <Mui.DialogContent>
                     <Mui.DialogContentText>Add a new reminder to the dashboard.</Mui.DialogContentText>
@@ -73,7 +73,7 @@ class AddReminderDialogComponent extends React.Component<IAddReminderDialogCompo
                 <Mui.DialogActions>
                     <Mui.Button
                         color="primary"
-                        onClick={this.handleOnClose}>
+                        onClick={this.props.onClose}>
                         Cancel
                     </Mui.Button>
                     <Mui.Button
@@ -86,40 +86,51 @@ class AddReminderDialogComponent extends React.Component<IAddReminderDialogCompo
         );
     }
 
-    private handleTitleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
+    /**
+     * Handle the form's 'title' field being changed by the user.
+     */
+    private readonly handleTitleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
         this.setState({
             ...this.state,
             title: evt.target.value || ''
         });
     }
 
-    private handleDescriptionChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
+    /**
+     * Handle the form's 'description' field being changed by the user.
+     */
+    private readonly handleDescriptionChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
         this.setState({
             ...this.state,
             description: evt.target.value || ''
         });
     }
 
-    private handleDateChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
+    /**
+     * Handle the form's 'for date' selector being changed by the user.
+     */
+    private readonly handleDateChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
         this.setState({
             ...this.state,
             forDate: moment(evt.target.value, 'YYYY-MM-DD').toDate()
         });
     }
 
-    private handleRecurrenceChange = (evt: React.ChangeEvent<HTMLSelectElement>) => {
-        console.log(evt);
+    /**
+     * Handle the form's 'recurrence' select being changed by the user.
+     */
+    private readonly handleRecurrenceChange = (evt: React.ChangeEvent<HTMLSelectElement>) => {
         this.setState({
             ...this.state,
             recurrence: parseInt(evt.target.value, 10)
         });
     }
 
-    private handleOnClose = () => {
-        this.props.onClose();
-    }
-
-    private handleSave = () => {
+    /**
+     * Handle the user having clicked the save button; pass the
+     * form data down to the onSave callback.
+     */
+    private readonly handleSave = () => {
         this.props.onSave({
             description: this.state.description,
             forDate: this.state.forDate,
@@ -130,4 +141,4 @@ class AddReminderDialogComponent extends React.Component<IAddReminderDialogCompo
     }
 }
 
-export default AddReminderDialogComponent;
+export default AddReminderModal;

@@ -41,8 +41,13 @@ class ReminderAppMenu extends React.Component<IReminderAppMenuProps> {
         );
     }
 
-    private handleMenuItemClick = (func: () => void) => (evt: any)  => {
-        func();
+    /**
+     * Handle one of the menu items being clicked - run its
+     * action then close the menu.
+     */
+    private readonly handleMenuItemClick = (menuActionFunction: () => void) => (evt: any)  => {
+        menuActionFunction();
+        // close the menu after calling the action
         this.props.onClosed();
     }
 }
