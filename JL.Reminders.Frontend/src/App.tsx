@@ -7,9 +7,9 @@ import AddReminderDialogComponent from './components/AddReminderDialog';
 import ReminderAppMenuBar from './components/ReminderAppMenuBar';
 import ReminderCardContainer from './components/ReminderCardContainer';
 
-import IAddReminderRequest from './interfaces/IAddReminderRequest';
-import IMenuItem from './interfaces/IMenuItem';
-import IReminder from './interfaces/IReminder';
+import IAddReminderRequest from './model/IAddReminderRequest';
+import IMenuItem from './model/IMenuItem';
+import IReminder from './model/IReminder';
 
 export interface IAppState {
     addDialogOpen: boolean;

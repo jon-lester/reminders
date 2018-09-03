@@ -1,7 +1,7 @@
 import * as Mui from '@material-ui/core/';
 import * as React from 'react';
 
-import IReminder from '../interfaces/IReminder';
+import IReminder from '../model/IReminder';
 
 export interface IReminderCardProps {
     onMarkActioned: (reminder: IReminder) => void,

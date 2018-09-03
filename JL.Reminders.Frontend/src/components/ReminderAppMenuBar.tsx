@@ -4,7 +4,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import * as React from 'react';
 import ReminderAppMenu from './ReminderAppMenu';
 
-import IMenuItem from '../interfaces/IMenuItem';
+import IMenuItem from '../model/IMenuItem';
 
 const styles = (theme: Mui.Theme) => Mui.createStyles({
     flex: {

@@ -1,7 +1,8 @@
 import * as Mui from '@material-ui/core';
+import * as moment from 'moment';
 import * as React from 'react';
 
-import IAddReminderRequest from '../interfaces/IAddReminderRequest';
+import IAddReminderRequest from '../model/IAddReminderRequest';
 
 interface IAddReminderDialogComponentProps {
     open: boolean;
@@ -47,12 +48,27 @@ class AddReminderDialogComponent extends React.Component<IAddReminderDialogCompo
                         label="Description"
                         fullWidth={true}/>
                     <Mui.TextField
-                        id="reminder.fordate"
+                        id="reminder-fordate"
+                        style={{marginTop: 20}}
                         onChange={this.handleDateChange}
+                        defaultValue={moment().format('YYYY-MM-DD')}
                         label="For Date"
                         fullWidth={true}
                         InputLabelProps={{shrink: true}}
                         type="date"/>
+                    <Mui.FormControl style={{minWidth: 120}}>
+                        <Mui.InputLabel htmlFor="reminder-recurrence">Recurrence</Mui.InputLabel>
+                        <Mui.Select
+                            inputProps={{name: 'recurrence', id: 'reminder-recurrence' }}
+                            onChange={this.handleRecurrenceChange}
+                            value={this.state.recurrence}>
+                            <Mui.MenuItem value={0}>One-off</Mui.MenuItem>
+                            <Mui.MenuItem value={1}>Annual</Mui.MenuItem>
+                            <Mui.MenuItem value={2}>Six-Monthly</Mui.MenuItem>
+                            <Mui.MenuItem value={3}>Quarterly</Mui.MenuItem>
+                            <Mui.MenuItem value={4}>Monthly</Mui.MenuItem>
+                        </Mui.Select>
+                    </Mui.FormControl>
                 </Mui.DialogContent>
                 <Mui.DialogActions>
                     <Mui.Button
@@ -85,10 +101,17 @@ class AddReminderDialogComponent extends React.Component<IAddReminderDialogCompo
     }
 
     private handleDateChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
-        console.log(evt.target.value);
         this.setState({
             ...this.state,
-            forDate: new Date()
+            forDate: moment(evt.target.value, 'YYYY-MM-DD').toDate()
+        });
+    }
+
+    private handleRecurrenceChange = (evt: React.ChangeEvent<HTMLSelectElement>) => {
+        console.log(evt);
+        this.setState({
+            ...this.state,
+            recurrence: parseInt(evt.target.value, 10)
         });
     }
 
@@ -99,9 +122,9 @@ class AddReminderDialogComponent extends React.Component<IAddReminderDialogCompo
     private handleSave = () => {
         this.props.onSave({
             description: this.state.description,
-            forDate: new Date(),
-            importance: 1,
-            recurrence: 2,
+            forDate: this.state.forDate,
+            importance: this.state.importance,
+            recurrence: this.state.recurrence,
             title: this.state.title
         });
     }

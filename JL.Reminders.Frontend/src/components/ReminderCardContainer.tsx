@@ -3,7 +3,7 @@ import * as React from 'react';
 
 import ReminderCard from './ReminderCard';
 
-import IReminder from '../interfaces/IReminder';
+import IReminder from '../model/IReminder';
 
 export interface IReminderCardContainerProps {
     reminders: IReminder[],
