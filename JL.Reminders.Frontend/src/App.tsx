@@ -4,6 +4,7 @@ import Typography from '@material-ui/core/Typography';
 import * as React from 'react';
 
 import AddReminderModal from './components/AddReminderModal';
+import { IWithApiProps, withApi } from './components/ApiComponent';
 import ReminderAppMenuBar from './components/ReminderAppMenuBar';
 import ReminderCardContainer from './components/ReminderCardContainer';
 
@@ -18,7 +19,7 @@ export interface IAppState {
     snackbarOpen: boolean;
 }
 
-class App extends React.Component<any, IAppState> {
+class App extends React.Component<{} & IWithApiProps, IAppState> {
 
     private readonly menuItems: IMenuItem[];
 
@@ -77,16 +78,7 @@ class App extends React.Component<any, IAppState> {
      * When the app component mounts, load all reminders from the API.
      */
     public componentDidMount() {
-        const uri = 'https://2d410672-d82b-4642-918f-d96db1e140e1.mock.pstmn.io/api/reminders/';
-        // const uri = 'http://localhost:49900/api/reminders/';
-        fetch(uri)
-            .then(response => response.json())
-            .then(json => {
-                this.setState({
-                    reminders: json
-                });
-                this.render();
-            });
+        this.props.onGetAllReminders().then(reminders => this.setState({reminders}));
     }
 
     /**
@@ -141,4 +133,4 @@ class App extends React.Component<any, IAppState> {
     }
 }
 
-export default App;
+export default withApi(App);
