@@ -34,9 +34,9 @@ namespace JL.Reminders.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-			services.AddCors(co =>
+			services.AddCors(corsOptions =>
 			{
-				co.AddPolicy("RemindersUI", builder =>
+				corsOptions.AddPolicy("RemindersUI", builder =>
 				{
 					builder
 						.WithOrigins("http://localhost:3000")
@@ -89,7 +89,7 @@ namespace JL.Reminders.Api
 	    {
 		    Mapper.Initialize(config =>
 		    {
-			    config.CreateMap<ReminderDetailsModel, Reminder>();
+			    config.CreateMap<ReminderCreateModel, Reminder>();
 		    });
 		}
     }
@@ -100,6 +100,7 @@ namespace JL.Reminders.Api
 		{
 			serviceCollection.AddSingleton<IConnectionStringFactory, ConnectionStringFactory>();
 			serviceCollection.AddSingleton<IRemindersRepository, RemindersRepository>();
+			serviceCollection.AddSingleton<IReminderOptionsRepository, ReminderOptionsRepository>();
 		}
 	}
 }

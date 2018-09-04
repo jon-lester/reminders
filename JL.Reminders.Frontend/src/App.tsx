@@ -11,10 +11,12 @@ import ReminderCardContainer from './components/ReminderCardContainer';
 import IAddReminderRequest from './model/IAddReminderRequest';
 import IMenuItem from './model/IMenuItem';
 import IReminder from './model/IReminder';
+import IReminderOptions from './model/IReminderOptions';
 
 export interface IAppState {
     addDialogOpen: boolean;
     reminders: IReminder[];
+    reminderOptions: IReminderOptions;
     snackbarMessage: string | undefined;
     snackbarOpen: boolean;
 }
@@ -27,6 +29,10 @@ class App extends React.Component<{} & IWithApiProps, IAppState> {
         super(props);
         this.state = {
             addDialogOpen: false,
+            reminderOptions: {
+                importances: {},
+                recurrences: {}
+            },
             reminders: [],
             snackbarMessage: undefined,
             snackbarOpen: false
@@ -60,10 +66,13 @@ class App extends React.Component<{} & IWithApiProps, IAppState> {
                     onMarkActioned={this.handleMarkActioned}
                     onMarkArchived={this.handleMarkArchived}
                 />
+                {!this.state.addDialogOpen ||
                 <AddReminderModal
+                    importanceOptions={this.state.reminderOptions.importances}
+                    occurrenceOptions={this.state.reminderOptions.recurrences}
                     onClose={this.handleAddReminderDialogClosed}
                     onSave={this.handleAddReminderDialogSave}
-                    open={this.state.addDialogOpen} />
+                    open={this.state.addDialogOpen} />}
                 <Snackbar
                     autoHideDuration={3000}
                     open={this.state.snackbarOpen}
@@ -75,9 +84,13 @@ class App extends React.Component<{} & IWithApiProps, IAppState> {
     }
 
     /**
-     * When the app component mounts, load all reminders from the API.
+     * When the app component mounts, load options and all reminders from the API.
      */
     public componentDidMount() {
+
+        this.props.onGetOptions()
+            .then(options => this.setState({...this.state, reminderOptions: options}));
+
         this.refreshAllReminders();
     }
 

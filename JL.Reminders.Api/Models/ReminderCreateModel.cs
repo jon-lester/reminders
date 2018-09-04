@@ -7,7 +7,7 @@ using JL.Reminders.Core.Model;
 
 namespace JL.Reminders.Api.Models
 {
-    public class ReminderDetailsModel
+    public class ReminderCreateModel
     {
 	    public string Title { get; set; }
 	    public string Description { get; set; }

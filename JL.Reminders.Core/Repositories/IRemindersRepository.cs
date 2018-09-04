@@ -1,6 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using JL.Reminders.Core.Model;
 
 namespace JL.Reminders.Core.Repositories

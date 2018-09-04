@@ -6,6 +6,8 @@ import IAddReminderRequest from '../model/IAddReminderRequest';
 
 interface IAddReminderDialogComponentProps {
     open: boolean;
+    occurrenceOptions: {[key: number]: string};
+    importanceOptions: {[key: number]: string};
     onClose(): void;
     onSave(addReminderRequest: IAddReminderRequest): void;
 }
@@ -25,6 +27,21 @@ class AddReminderModal extends React.Component<IAddReminderDialogComponentProps,
     }
 
     public render() {
+
+        const occurrenceOptions = [];
+
+        for (const key in this.props.occurrenceOptions) {
+            if (this.props.occurrenceOptions.hasOwnProperty(key)) {
+                occurrenceOptions.push(
+                    <Mui.MenuItem
+                        key={key}
+                        value={key}>
+                        {this.props.occurrenceOptions[key]}
+                    </Mui.MenuItem>
+                )
+            }
+        }
+
         return (
             <Mui.Dialog
                 disableBackdropClick={true}
@@ -61,12 +78,8 @@ class AddReminderModal extends React.Component<IAddReminderDialogComponentProps,
                         <Mui.Select
                             inputProps={{name: 'recurrence', id: 'reminder-recurrence' }}
                             onChange={this.handleRecurrenceChange}
-                            value={this.state.recurrence}>
-                            <Mui.MenuItem value={0}>One-off</Mui.MenuItem>
-                            <Mui.MenuItem value={1}>Annual</Mui.MenuItem>
-                            <Mui.MenuItem value={2}>Six-Monthly</Mui.MenuItem>
-                            <Mui.MenuItem value={3}>Quarterly</Mui.MenuItem>
-                            <Mui.MenuItem value={4}>Monthly</Mui.MenuItem>
+                            value={this.state.recurrence.toString()}>
+                            {occurrenceOptions}
                         </Mui.Select>
                     </Mui.FormControl>
                 </Mui.DialogContent>
@@ -123,10 +136,12 @@ class AddReminderModal extends React.Component<IAddReminderDialogComponentProps,
      * Handle the form's 'recurrence' select being changed by the user.
      */
     private readonly handleRecurrenceChange = (evt: React.ChangeEvent<HTMLSelectElement>) => {
+        console.log(evt.target.value);
         this.setState({
             ...this.state,
             recurrence: parseInt(evt.target.value, 10)
         });
+        console.log(this.state.recurrence);
     }
 
     /**

@@ -2,8 +2,10 @@ import * as React from 'react';
 
 import IAddReminderRequest from '../model/IAddReminderRequest';
 import IReminder from '../model/IReminder';
+import IReminderOptions from '../model/IReminderOptions';
 
 export interface IWithApiProps {
+    onGetOptions: () => Promise<IReminderOptions>;
     onGetAllReminders: () => Promise<IReminder[]>;
     onAddReminder: (addReminderRequest: IAddReminderRequest) => Promise<number>;
 }
@@ -21,9 +23,15 @@ export const withApi = <P extends object>(Component: React.ComponentType<P & IWi
 
         public render() {
             return <Component
+                onGetOptions={this.getOptions}
                 onGetAllReminders={this.getAllReminders}
                 onAddReminder={this.addReminder}
                 {...this.props}/>;
+        }
+
+        private getOptions = () => {
+            return fetch(this.makeUri('api/reminders/options'))
+                .then(response => response.json());
         }
 
         private getAllReminders = () => {

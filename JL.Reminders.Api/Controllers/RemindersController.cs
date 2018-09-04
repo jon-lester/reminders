@@ -21,10 +21,14 @@ namespace JL.Reminders.Api.Controllers
     public class RemindersController : Controller
     {
 	    private readonly IRemindersRepository remindersRepository;
+	    private readonly IReminderOptionsRepository reminderOptionsRepository;
 
-	    public RemindersController(IRemindersRepository remindersRepository)
+	    public RemindersController(
+		    IRemindersRepository remindersRepository,
+		    IReminderOptionsRepository reminderOptionsRepository)
 	    {
 		    this.remindersRepository = remindersRepository;
+		    this.reminderOptionsRepository = reminderOptionsRepository;
 	    }
 
 		/// <summary>
@@ -38,6 +42,19 @@ namespace JL.Reminders.Api.Controllers
 
 			return Ok(reminders);
 		}
+
+		/// <summary>
+		/// Fetch the valid values for adding or editing
+		/// </summary>
+		/// <returns></returns>
+	    [HttpGet]
+	    [Route("options")]
+	    public async Task<IActionResult> GetOptions()
+	    {
+		    var reminderOptions = await this.reminderOptionsRepository.GetReminderOptions();
+
+		    return Ok(reminderOptions);
+	    }
 
 		/// <summary>
 		/// Fetch a single reminder by its ID.
@@ -61,10 +78,10 @@ namespace JL.Reminders.Api.Controllers
 		/// <summary>
 		/// Add a new reminder for the current user.
 		/// </summary>
-		/// <param name="reminder">The <see cref="ReminderDetailsModel"/> to add as a new reminder.</param>
+		/// <param name="reminder">The <see cref="ReminderCreateModel"/> to add as a new reminder.</param>
 		/// <returns>The location of the new reminder as a Location header.</returns>
 	    [HttpPost]
-	    public async Task<IActionResult> PostReminder([FromBody] ReminderDetailsModel reminder)
+	    public async Task<IActionResult> PostReminder([FromBody] ReminderCreateModel reminder)
 	    {
 			var reminderId = await this.remindersRepository.AddReminderAsync(1, Mapper.Map<Reminder>(reminder));
 
@@ -75,11 +92,11 @@ namespace JL.Reminders.Api.Controllers
 		/// Update an existing reminder.
 		/// </summary>
 		/// <param name="id">The ID of the reminder to update.</param>
-		/// <param name="reminder">A <see cref="ReminderDetailsModel"/> containing changes to apply to the given reminder.</param>
+		/// <param name="reminder">A <see cref="ReminderCreateModel"/> containing changes to apply to the given reminder.</param>
 		/// <returns>200 if changes were applied, otherwise 404.</returns>
 	    [HttpPut]
 		[Route("{id}")]
-	    public async Task<IActionResult> UpdateReminder(int id, [FromBody] ReminderDetailsModel reminder)
+	    public async Task<IActionResult> UpdateReminder(int id, [FromBody] ReminderCreateModel reminder)
 	    {
 		    var obj = Mapper.Map<Reminder>(reminder);
 		    obj.ID = id;
