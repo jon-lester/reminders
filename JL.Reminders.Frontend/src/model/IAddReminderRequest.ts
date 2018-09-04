@@ -4,7 +4,7 @@
  */
 export default interface IAddReminderRequest {
     description: string;
-    forDate: Date;
+    forDate: string;
     importance: number;
     recurrence: number;
     title: string;

@@ -17,7 +17,7 @@ class AddReminderModal extends React.Component<IAddReminderDialogComponentProps,
 
         this.state = {
             description: '',
-            forDate: new Date(),
+            forDate: moment().format(),
             importance: 0,
             recurrence: 0,
             title: ''
@@ -110,9 +110,12 @@ class AddReminderModal extends React.Component<IAddReminderDialogComponentProps,
      * Handle the form's 'for date' selector being changed by the user.
      */
     private readonly handleDateChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
+
+        const userMoment = moment.utc(evt.target.value, 'YYYY-MM-DD', true);
+
         this.setState({
             ...this.state,
-            forDate: moment(evt.target.value, 'YYYY-MM-DD').toDate()
+            forDate: userMoment.format()
         });
     }
 
