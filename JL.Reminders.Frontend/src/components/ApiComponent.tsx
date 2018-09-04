@@ -38,7 +38,9 @@ export const withApi = <P extends object>(Component: React.ComponentType<P & IWi
 
             const headers = new Headers();
             headers.append('Content-Type', 'application/json');
-    
+
+            // todo - handle errors, and get the id for the new record
+            // from the location header to return from this function
             return fetch(this.makeUri('api/reminders'), {
                 body: JSON.stringify(addReminderRequest),
                 headers: {
