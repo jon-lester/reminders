@@ -1,4 +1,5 @@
 import * as Mui from '@material-ui/core/';
+import * as moment from 'moment';
 import * as React from 'react';
 
 import { createStyles, withStyles } from '@material-ui/core/styles';
@@ -10,7 +11,7 @@ import ReminderAppMenu from './ReminderAppMenu';
 
 const styles = () => createStyles({
     card: {
-        minWidth: 250
+        width: 250
     },
     time: {
         marginBottom: 30
@@ -64,6 +65,7 @@ class ReminderCard extends React.Component<IReminderCardProps & Mui.WithStyles<t
             <Mui.Card className={this.props.classes.card}>
                 <Mui.CardHeader
                     title = {formattedReminder.title ? formattedReminder.title : 'Untitled'}
+                    subheader = {this.getSubHeader()}
                     action={<Mui.IconButton onClick={this.handleMenuOpen}>
                                 <MoreVertIcon />
                             </Mui.IconButton>}/>
@@ -100,6 +102,13 @@ class ReminderCard extends React.Component<IReminderCardProps & Mui.WithStyles<t
                     : this.props.reminder.title)
                 : 'Untitled'
         };
+    }
+
+    private readonly getSubHeader = (): string => {
+
+        const forDate = moment.utc(this.props.reminder.forDate);
+
+        return `Annual for ${forDate.format('MMM Do YYYY')}`;
     }
 
     /**
