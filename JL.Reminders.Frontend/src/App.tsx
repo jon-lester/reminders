@@ -78,6 +78,10 @@ class App extends React.Component<{} & IWithApiProps, IAppState> {
      * When the app component mounts, load all reminders from the API.
      */
     public componentDidMount() {
+        this.refreshAllReminders();
+    }
+
+    private readonly refreshAllReminders = () => {
         this.props.onGetAllReminders().then(reminders => this.setState({reminders}));
     }
 
@@ -105,7 +109,11 @@ class App extends React.Component<{} & IWithApiProps, IAppState> {
      * Handle the user having requested to save a new reminder.
      */
     private readonly handleAddReminderDialogSave = (saveRequest: IAddReminderRequest) => {
-        // TODO - save reminder
+        this.props.onAddReminder(saveRequest)
+            .then((id: number) => {
+                console.log(`Saved new reminder with id = ${id}`);
+                this.refreshAllReminders()
+            });
         this.handleAddReminderDialogClosed();
     }
 

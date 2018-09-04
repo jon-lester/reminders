@@ -34,7 +34,18 @@ namespace JL.Reminders.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-	        services.AddMvc(mvcOptions =>
+			services.AddCors(co =>
+			{
+				co.AddPolicy("RemindersUI", builder =>
+				{
+					builder
+						.WithOrigins("http://localhost:3000")
+						.WithHeaders("Content-Type")
+						.WithMethods("GET", "POST", "PUT", "DELETE");
+				});
+			});
+
+			services.AddMvc(mvcOptions =>
 		        {
 		        })
 		        .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
@@ -57,7 +68,7 @@ namespace JL.Reminders.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
+			if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
 
@@ -68,8 +79,6 @@ namespace JL.Reminders.Api
 		            c.SwaggerEndpoint("/swagger/v1/swagger.json", "Reminders v1");
 				});
 			}
-
-	        app.UseCors(configurePolicy => { configurePolicy.AllowAnyOrigin(); });
 
 	        app.UseMvc();
 

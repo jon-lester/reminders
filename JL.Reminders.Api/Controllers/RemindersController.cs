@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +17,7 @@ namespace JL.Reminders.Api.Controllers
 	[ApiController]
 	[Produces("application/json")]
     [Route("api/[controller]")]
+	[EnableCors("RemindersUI")]
     public class RemindersController : Controller
     {
 	    private readonly IRemindersRepository remindersRepository;
