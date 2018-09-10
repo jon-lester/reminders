@@ -95,7 +95,7 @@ class App extends React.Component<{} & IWithApiProps, IAppState> {
     }
 
     private readonly refreshAllReminders = () => {
-        this.props.onGetAllReminders().then(reminders => this.setState({reminders}));
+        this.props.onGetAllReminders().then(reminders => this.setState({reminders: reminders.sort((a, b) => a.daysToGo - b.daysToGo)}));
     }
 
     /**

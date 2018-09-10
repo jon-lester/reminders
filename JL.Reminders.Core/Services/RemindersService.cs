@@ -105,7 +105,7 @@ namespace JL.Reminders.Core.Services
 				case Recurrence.Monthly:
 					return $"{GetOrdinal(r.ForDate.Day)} of each month.";
 				case Recurrence.OneOff:
-					return $"One-off on {r.ForDate:dd/MMM/yy}";
+					return $"{GetOrdinal(r.ForDate.Day)} {r.ForDate:MMMM, yyyy}";
 				case Recurrence.Quarterly:
 					return $"Quarterly from {GetOrdinal(r.ForDate.Day)} {r.ForDate:MMM}.";
 				case Recurrence.SixMonthly:

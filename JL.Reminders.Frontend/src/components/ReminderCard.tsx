@@ -7,13 +7,11 @@ import MoreVertIcon from '@material-ui/icons/MoreVert'
 import IMenuItem from '../model/IMenuItem';
 import IReminder from '../model/IReminder';
 import ReminderAppMenu from './ReminderAppMenu';
+import ReminderCardDays from './ReminderCardDays';
 
 const styles = () => createStyles({
     card: {
         width: 250
-    },
-    time: {
-        marginBottom: 30
     }
 });
 
@@ -69,15 +67,7 @@ class ReminderCard extends React.Component<IReminderCardProps & Mui.WithStyles<t
                                 <MoreVertIcon />
                             </Mui.IconButton>}/>
                 <Mui.CardContent>
-                <Mui.Typography
-                    className = {this.props.classes.time}
-                    align = "center"
-                    variant = "display4">
-                    {formattedReminder.daysToGo}
-                </Mui.Typography>
-                <Mui.Typography component="p">
-                    {formattedReminder.description}
-                </Mui.Typography>
+                    <ReminderCardDays days={this.props.reminder.daysToGo} />
                 </Mui.CardContent>
             </Mui.Card>
             <ReminderAppMenu open={this.state.menuOpen} onClosed={this.handleMenuClosed} menuItems={this.menuItems} anchorEl={this.state.menuElement} />
