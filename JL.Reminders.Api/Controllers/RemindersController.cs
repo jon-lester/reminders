@@ -10,7 +10,7 @@ using AutoMapper;
 
 using JL.Reminders.Api.Models;
 using JL.Reminders.Core.Model;
-using JL.Reminders.Core.Repositories;
+using JL.Reminders.Core.Services;
 
 namespace JL.Reminders.Api.Controllers
 {
@@ -20,15 +20,11 @@ namespace JL.Reminders.Api.Controllers
 	[EnableCors("RemindersUI")]
     public class RemindersController : Controller
     {
-	    private readonly IRemindersRepository remindersRepository;
-	    private readonly IReminderOptionsRepository reminderOptionsRepository;
+	    private readonly IRemindersService remindersService;
 
-	    public RemindersController(
-		    IRemindersRepository remindersRepository,
-		    IReminderOptionsRepository reminderOptionsRepository)
+	    public RemindersController(IRemindersService remindersService)
 	    {
-		    this.remindersRepository = remindersRepository;
-		    this.reminderOptionsRepository = reminderOptionsRepository;
+		    this.remindersService = remindersService;
 	    }
 
 		/// <summary>
@@ -38,7 +34,7 @@ namespace JL.Reminders.Api.Controllers
 		[HttpGet]
 		public async Task<IActionResult> GetAllReminders()
 		{
-			var reminders = await this.remindersRepository.GetRemindersByUserIdAsync(1);
+			var reminders = await this.remindersService.GetRemindersByUserIdAsync(1);
 
 			return Ok(reminders);
 		}
@@ -51,7 +47,7 @@ namespace JL.Reminders.Api.Controllers
 	    [Route("options")]
 	    public async Task<IActionResult> GetOptions()
 	    {
-		    var reminderOptions = await this.reminderOptionsRepository.GetReminderOptions();
+		    var reminderOptions = await this.remindersService.GetReminderOptions();
 
 		    return Ok(reminderOptions);
 	    }
@@ -65,7 +61,7 @@ namespace JL.Reminders.Api.Controllers
 	    [Route("{id}")]
 		public async Task<IActionResult> GetReminder(long id)
 	    {
-			var reminder = await this.remindersRepository.GetReminderByIdAsync(1, id);
+			var reminder = await this.remindersService.GetReminderByIdAsync(1, id);
 
 		    if (reminder == null)
 		    {
@@ -78,30 +74,52 @@ namespace JL.Reminders.Api.Controllers
 		/// <summary>
 		/// Add a new reminder for the current user.
 		/// </summary>
-		/// <param name="reminder">The <see cref="ReminderCreateModel"/> to add as a new reminder.</param>
+		/// <param name="postNewReminder">The <see cref="PostNewReminderModel"/> to add as a new reminder.</param>
 		/// <returns>The location of the new reminder as a Location header.</returns>
 	    [HttpPost]
-	    public async Task<IActionResult> PostReminder([FromBody] ReminderCreateModel reminder)
+	    public async Task<IActionResult> PostReminder([FromBody] PostNewReminderModel postNewReminder)
 	    {
-			var reminderId = await this.remindersRepository.AddReminderAsync(1, Mapper.Map<Reminder>(reminder));
+			var reminderId = await this.remindersService.AddReminderAsync(1, Mapper.Map<Reminder>(postNewReminder));
 
 		    return Created($"{Request.Path.ToString()}/{reminderId}", null);
 		}
 
 		/// <summary>
+		/// Add an 'actioned' item for the current user's given reminder.
+		/// </summary>
+		/// <param name="postNewAction">The <see cref="PostNewActionModel"/> describing the action to post for the given reminder.</param>
+		/// <returns>200 if the action was posted, or 404 if the reminder was not found.</returns>
+	    [HttpPost]
+	    [Route("{id}/actions")]
+	    public async Task<IActionResult> PostAction([FromBody] PostNewActionModel postNewAction)
+	    {
+		    try
+		    {
+			    var success =
+				    await this.remindersService.ActionReminderAsync(1, Mapper.Map<ReminderAction>(postNewAction));
+
+			    return success ? (IActionResult)Ok() : NotFound();
+			}
+		    catch (Exception)
+		    {
+			    return StatusCode(500);
+		    }
+	    }
+
+		/// <summary>
 		/// Update an existing reminder.
 		/// </summary>
 		/// <param name="id">The ID of the reminder to update.</param>
-		/// <param name="reminder">A <see cref="ReminderCreateModel"/> containing changes to apply to the given reminder.</param>
+		/// <param name="postNewReminder">A <see cref="PostNewReminderModel"/> containing changes to apply to the given reminder.</param>
 		/// <returns>200 if changes were applied, otherwise 404.</returns>
 	    [HttpPut]
 		[Route("{id}")]
-	    public async Task<IActionResult> UpdateReminder(int id, [FromBody] ReminderCreateModel reminder)
+	    public async Task<IActionResult> UpdateReminder(int id, [FromBody] PostNewReminderModel postNewReminder)
 	    {
-		    var obj = Mapper.Map<Reminder>(reminder);
+		    var obj = Mapper.Map<Reminder>(postNewReminder);
 		    obj.ID = id;
 
-			var success = await this.remindersRepository.UpdateReminderAsync(1, obj);
+			var success = await this.remindersService.UpdateReminderAsync(1, obj);
 
 		    if (!success)
 		    {
@@ -117,10 +135,10 @@ namespace JL.Reminders.Api.Controllers
 		/// <param name="id">The ID of the reminder to delete.</param>
 		/// <returns>200 if a reminder was deleted, otherwise 404.</returns>
 	    [HttpDelete]
-	    [Route("id")]
+	    [Route("{id}")]
 	    public async Task<IActionResult> DeleteReminder(long id)
 	    {
-		    var success = await this.remindersRepository.DeleteReminderAsync(1, id);
+		    var success = await this.remindersService.DeleteReminderAsync(1, id);
 
 		    if (!success)
 		    {

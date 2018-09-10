@@ -5,6 +5,7 @@
 export default interface IReminder {
     id: number;
     title: string;
+    subTitle: string;
     daysToGo: number;
     description: string;
     forDate: Date;

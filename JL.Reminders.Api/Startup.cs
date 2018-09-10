@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc;
 
 using AutoMapper;
@@ -17,8 +12,6 @@ using FluentValidation.AspNetCore;
 
 using JL.Reminders.Api.Models;
 using JL.Reminders.Core.Model;
-using JL.Reminders.Core.Repositories;
-using JL.Reminders.Data;
 
 namespace JL.Reminders.Api
 {
@@ -89,18 +82,12 @@ namespace JL.Reminders.Api
 	    {
 		    Mapper.Initialize(config =>
 		    {
-			    config.CreateMap<ReminderCreateModel, Reminder>();
+			    config.CreateMap<PostNewReminderModel, Reminder>();
+
+			    config.CreateMap<PostNewActionModel, ReminderAction>()
+				    .ForMember(m => m.ReminderId, opt => opt.MapFrom(vm => vm.ReminderId))
+				    .ForMember(m => m.Notes, opt => opt.MapFrom(vm => vm.Notes));
 		    });
 		}
     }
-
-	public static class ServiceExtensions
-	{
-		public static void AddRemindersApp(this IServiceCollection serviceCollection)
-		{
-			serviceCollection.AddSingleton<IConnectionStringFactory, ConnectionStringFactory>();
-			serviceCollection.AddSingleton<IRemindersRepository, RemindersRepository>();
-			serviceCollection.AddSingleton<IReminderOptionsRepository, ReminderOptionsRepository>();
-		}
-	}
 }

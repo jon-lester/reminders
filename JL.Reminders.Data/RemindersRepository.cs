@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
+
 using Dapper;
-using Dapper.Contrib.Extensions;
+using MySql.Data.MySqlClient;
+
 using JL.Reminders.Core.Model;
 using JL.Reminders.Core.Repositories;
-using MySql.Data.MySqlClient;
 
 namespace JL.Reminders.Data
 {
@@ -51,7 +51,7 @@ namespace JL.Reminders.Data
 						description = reminder.Description,
 						fordate = reminder.ForDate,
 						recurrence = reminder.Recurrence,
-						Importance = reminder.Importance
+						importance = reminder.Importance
 					});
 
 				return await conn.QueryFirstAsync<long>("SELECT LAST_INSERT_ID();");
@@ -117,6 +117,25 @@ namespace JL.Reminders.Data
 						recurrence = reminder.Recurrence,
 						importance = reminder.Importance,
 						id = reminder.ID,
+						userId
+					});
+
+				return updated > 0;
+			}
+		}
+
+		public async Task<bool> UpdateReminderLastActionedAsync(long userId, long reminderId, DateTime lastActioned)
+		{
+			using (MySqlConnection conn = new MySqlConnection(connectionStringFactory.GetConnectionString()))
+			{
+				var updated = await conn.ExecuteAsync(@"
+					UPDATE reminders SET
+						LastActioned = @lastActioned
+					WHERE ID = @id AND UserID = @userId;",
+					new
+					{
+						lastActioned,
+						id = reminderId,
 						userId
 					});
 

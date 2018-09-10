@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2035
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JL.Reminders.Api", "JL.Reminders.Api\JL.Reminders.Api.csproj", "{8F515BB2-44A0-4C01-BB81-B105118B18D5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JL.Reminders.Api", "JL.Reminders.Api\JL.Reminders.Api.csproj", "{8F515BB2-44A0-4C01-BB81-B105118B18D5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JL.Reminders.Core", "JL.Reminders.Core\JL.Reminders.Core.csproj", "{9328124F-3563-4B56-B6F2-236363ACC3EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JL.Reminders.Core", "JL.Reminders.Core\JL.Reminders.Core.csproj", "{9328124F-3563-4B56-B6F2-236363ACC3EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JL.Reminders.Data", "JL.Reminders.Data\JL.Reminders.Data.csproj", "{902BA6F9-C0EA-4004-A708-C1B67E66C5EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JL.Reminders.Data", "JL.Reminders.Data\JL.Reminders.Data.csproj", "{902BA6F9-C0EA-4004-A708-C1B67E66C5EA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JL.Reminders.Core.Tests", "JL.Reminders.Core.Tests\JL.Reminders.Core.Tests.csproj", "{670D68A9-6332-4BD4-AF04-5C7A37187B60}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{902BA6F9-C0EA-4004-A708-C1B67E66C5EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{902BA6F9-C0EA-4004-A708-C1B67E66C5EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{902BA6F9-C0EA-4004-A708-C1B67E66C5EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{670D68A9-6332-4BD4-AF04-5C7A37187B60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{670D68A9-6332-4BD4-AF04-5C7A37187B60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{670D68A9-6332-4BD4-AF04-5C7A37187B60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{670D68A9-6332-4BD4-AF04-5C7A37187B60}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

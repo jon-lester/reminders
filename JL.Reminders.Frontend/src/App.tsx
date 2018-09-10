@@ -133,8 +133,16 @@ class App extends React.Component<{} & IWithApiProps, IAppState> {
     /**
      * Handle the user having requested to mark an existing reminder as actioned.
      */
-    private readonly handleMarkActioned = (reminder: IReminder) =>
-        this.showToast(`${reminder.title} was marked as actioned.`);
+    private readonly handleMarkActioned = (reminder: IReminder) => {
+
+        this.props.onActionReminder({
+            notes: '',
+            reminderId: reminder.id
+        }).then(success => {
+            this.showToast(`${reminder.title} was marked as actioned.`);
+            this.refreshAllReminders();
+        });
+    }
 
     /**
      * Handle the user having requested to archive an existing reminder.

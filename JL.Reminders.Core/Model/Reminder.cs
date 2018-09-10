@@ -12,6 +12,7 @@ namespace JL.Reminders.Core.Model
 		/// <summary>
 		/// TODO: set this from a RemindersService
 		/// </summary>
+		public string SubTitle { get; set; }
 		public int DaysToGo { get; set; }
 		public DateTime Created { get; set; }
 		public Recurrence Recurrence { get; set; }

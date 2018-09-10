@@ -1,5 +1,4 @@
 import * as Mui from '@material-ui/core/';
-import * as moment from 'moment';
 import * as React from 'react';
 
 import { createStyles, withStyles } from '@material-ui/core/styles';
@@ -65,7 +64,7 @@ class ReminderCard extends React.Component<IReminderCardProps & Mui.WithStyles<t
             <Mui.Card className={this.props.classes.card}>
                 <Mui.CardHeader
                     title = {formattedReminder.title ? formattedReminder.title : 'Untitled'}
-                    subheader = {this.getSubHeader()}
+                    subheader = {formattedReminder.subTitle}
                     action={<Mui.IconButton onClick={this.handleMenuOpen}>
                                 <MoreVertIcon />
                             </Mui.IconButton>}/>
@@ -96,19 +95,13 @@ class ReminderCard extends React.Component<IReminderCardProps & Mui.WithStyles<t
             importance: this.props.reminder.importance,
             lastActioned: this.props.reminder.lastActioned,
             recurrence: this.props.reminder.recurrence,
+            subTitle: this.props.reminder.subTitle,
             title: this.props.reminder.title
                 ? (this.props.reminder.title.length > 16
                     ? this.props.reminder.title.substr(0, 14) + '..'
                     : this.props.reminder.title)
                 : 'Untitled'
         };
-    }
-
-    private readonly getSubHeader = (): string => {
-
-        const forDate = moment.utc(this.props.reminder.forDate);
-
-        return `Annual for ${forDate.format('MMM Do YYYY')}`;
     }
 
     /**
