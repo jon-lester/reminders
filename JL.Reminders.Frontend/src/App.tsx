@@ -41,15 +41,6 @@ class App extends React.Component<{} & IWithApiProps, IAppState> {
         // set up items for the main menu.
         this.menuItems = [
             {
-                action: () => {
-                    this.setState({
-                        ...this.state,
-                        addDialogOpen: true
-                    })
-                },
-                id: 1,
-                text: 'Add new reminder'
-            }, {
                 action: () => console.log('action 2'),
                 id: 2,
                 text: 'About'
@@ -65,6 +56,7 @@ class App extends React.Component<{} & IWithApiProps, IAppState> {
                     reminders={this.state.reminders}
                     onMarkActioned={this.handleMarkActioned}
                     onMarkArchived={this.handleMarkArchived}
+                    onAddReminder={this.handleAddReminder}
                 />
                 {!this.state.addDialogOpen ||
                 <AddReminderModal
@@ -89,13 +81,20 @@ class App extends React.Component<{} & IWithApiProps, IAppState> {
     public componentDidMount() {
 
         this.props.onGetOptions()
-            .then(options => this.setState({...this.state, reminderOptions: options}));
+            .then(options => {
+                this.setState({...this.state, reminderOptions: options});
+            })
+            // tslint:disable-next-line:no-console
+            .catch(reason => console.log(reason));
 
         this.refreshAllReminders();
     }
 
     private readonly refreshAllReminders = () => {
-        this.props.onGetAllReminders().then(reminders => this.setState({reminders: reminders.sort((a, b) => a.daysToGo - b.daysToGo)}));
+        this.props.onGetAllReminders()
+            .then(reminders => this.setState({reminders: reminders.sort((a, b) => a.daysToGo - b.daysToGo)}))
+            // tslint:disable-next-line:no-console
+            .catch(reason => console.log(reason));
     }
 
     /**
@@ -105,6 +104,16 @@ class App extends React.Component<{} & IWithApiProps, IAppState> {
         this.setState({
             ...this.state,
             snackbarOpen: false
+        });
+    }
+
+    /**
+     * Handle the user having clicked to add a new reminder.
+     */
+    private readonly handleAddReminder = () => {
+        this.setState({
+            ...this.state,
+            addDialogOpen: true
         });
     }
 
