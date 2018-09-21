@@ -20,7 +20,11 @@
       "commandName": "Project",
       "launchUrl": "api/values",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "REMINDERS_MYSQL_PASSWORD": "D3v_p4ssw0rD",
+        "REMINDERS_MYSQL_SCHEMA": "reminders",
+        "REMINDERS_MYSQL_USER": "reminders",
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "REMINDERS_MYSQL_SERVER": "127.0.0.1"
       },
       "applicationUrl": "http://localhost:49900/"
     }

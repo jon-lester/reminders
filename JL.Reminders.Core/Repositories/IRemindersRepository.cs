@@ -8,11 +8,11 @@ namespace JL.Reminders.Core.Repositories
 {
 	public interface IRemindersRepository
 	{
-		Task<IEnumerable<Reminder>> GetRemindersByUserIdAsync(long userId);
-		Task<Reminder> GetReminderByIdAsync(long userId, long reminderId);
-		Task<long> AddReminderAsync(long userId, Reminder reminder);
-		Task<bool> DeleteReminderAsync(long userId, long reminderId);
-		Task<bool> UpdateReminderAsync(long userId, Reminder reminder);
-		Task<bool> UpdateReminderLastActionedAsync(long userId, long reminderId, DateTime lastActioned);
+		Task<IEnumerable<Reminder>> GetRemindersByUserIdAsync(string userId);
+		Task<Reminder> GetReminderByIdAsync(string userId, long reminderId);
+		Task<long> AddReminderAsync(string userId, Reminder reminder);
+		Task<bool> DeleteReminderAsync(string userId, long reminderId);
+		Task<bool> UpdateReminderAsync(string userId, Reminder reminder);
+		Task<bool> UpdateReminderLastActionedAsync(string userId, long reminderId, DateTime lastActioned);
 	}
 }

@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 using JL.Reminders.Core.Model;
@@ -25,7 +24,7 @@ namespace JL.Reminders.Core.Services
 			this.reminderCalculationService = reminderCalculationService;
 		}
 
-		public async Task<IEnumerable<Reminder>> GetRemindersByUserIdAsync(long userId)
+		public async Task<IEnumerable<Reminder>> GetRemindersByUserIdAsync(string userId)
 		{
 			var reminders = (await this.remindersRepository.GetRemindersByUserIdAsync(userId)).ToList();
 
@@ -49,7 +48,7 @@ namespace JL.Reminders.Core.Services
 			return Task.FromResult(options);
 		}
 
-		public async Task<Reminder> GetReminderByIdAsync(long userId, long reminderId)
+		public async Task<Reminder> GetReminderByIdAsync(string userId, long reminderId)
 		{
 			var reminder = await this.remindersRepository.GetReminderByIdAsync(userId, reminderId);
 			reminder.DaysToGo = reminderCalculationService.CalculateDaysToGo(reminder);
@@ -57,22 +56,22 @@ namespace JL.Reminders.Core.Services
 			return reminder;
 		}
 
-		public async Task<long> AddReminderAsync(long userId, Reminder reminder)
+		public async Task<long> AddReminderAsync(string userId, Reminder reminder)
 		{
 			return await this.remindersRepository.AddReminderAsync(userId, reminder);
 		}
 
-		public async Task<bool> DeleteReminderAsync(long userId, long reminderId)
+		public async Task<bool> DeleteReminderAsync(string userId, long reminderId)
 		{
 			return await this.remindersRepository.DeleteReminderAsync(userId, reminderId);
 		}
 
-		public async Task<bool> UpdateReminderAsync(long userId, Reminder reminder)
+		public async Task<bool> UpdateReminderAsync(string userId, Reminder reminder)
 		{
 			return await this.remindersRepository.UpdateReminderAsync(userId, reminder);
 		}
 
-		public async Task<bool> ActionReminderAsync(long userId, ReminderAction action)
+		public async Task<bool> ActionReminderAsync(string userId, ReminderAction action)
 		{
 			// TODO: temp code pending db re-schema to store the action timestamp and notes
 

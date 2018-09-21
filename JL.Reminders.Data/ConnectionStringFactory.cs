@@ -9,13 +9,14 @@ namespace JL.Reminders.Data
 	{
 	    public string GetConnectionString()
 	    {
-			MySqlConnectionStringBuilder builder = new MySqlConnectionStringBuilder();
-
-		    builder.SslMode = MySqlSslMode.None;
-		    builder.Server = "127.0.0.1";
-		    builder.UserID = "reminders";
-		    builder.Password = "f0T3~.M3#1";
-		    builder.Database = "reminders";
+		    MySqlConnectionStringBuilder builder = new MySqlConnectionStringBuilder
+		    {
+			    SslMode = MySqlSslMode.None,
+			    Server = Environment.GetEnvironmentVariable("REMINDERS_MYSQL_SERVER"),
+			    UserID = Environment.GetEnvironmentVariable("REMINDERS_MYSQL_USER"),
+			    Password = Environment.GetEnvironmentVariable("REMINDERS_MYSQL_PASSWORD"),
+			    Database = Environment.GetEnvironmentVariable("REMINDERS_MYSQL_SCHEMA")
+		    };
 
 		    return builder.ToString();
 	    }

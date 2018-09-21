@@ -9,22 +9,22 @@ namespace JL.Reminders.Data
 {
 	public class MockRemindersRepository : IRemindersRepository
 	{
-		public Task<long> AddReminderAsync(long userId, Reminder reminder)
+		public Task<long> AddReminderAsync(string userId, Reminder reminder)
 		{
 			return Task.FromResult(1L);
 		}
 
-		public Task<bool> DeleteReminderAsync(long userId, long reminderId)
+		public Task<bool> DeleteReminderAsync(string userId, long reminderId)
 		{
 			return Task.FromResult(true);
 		}
 
-		public Task<Reminder> GetReminderByIdAsync(long userId, long reminderId)
+		public Task<Reminder> GetReminderByIdAsync(string userId, long reminderId)
 		{
 			return Task.FromResult(new Reminder());
 		}
 
-		public Task<IEnumerable<Reminder>> GetRemindersByUserIdAsync(long userId)
+		public Task<IEnumerable<Reminder>> GetRemindersByUserIdAsync(string userId)
 		{
 			return Task.FromResult(new List<Reminder>
 			{
@@ -70,12 +70,12 @@ namespace JL.Reminders.Data
 			} as IEnumerable<Reminder>);
 		}
 
-		public Task<bool> UpdateReminderAsync(long userId, Reminder reminder)
+		public Task<bool> UpdateReminderAsync(string userId, Reminder reminder)
 		{
 			return Task.FromResult(true);
 		}
 
-		public Task<bool> UpdateReminderLastActionedAsync(long userId, long reminderId, DateTime lastActioned)
+		public Task<bool> UpdateReminderLastActionedAsync(string userId, long reminderId, DateTime lastActioned)
 		{
 			return Task.FromResult(true);
 		}

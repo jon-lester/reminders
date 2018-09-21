@@ -21,7 +21,10 @@ const styles = (theme: Mui.Theme) => Mui.createStyles({
 });
 
 interface IReminderAppMenuBarProps extends Mui.WithStyles<typeof styles> {
-    menuItems: IMenuItem[]
+    menuItems: IMenuItem[],
+    onLogin?: () => {},
+    onLogout?: () => {},
+    isLoggedIn: boolean;
 }
 
 interface IReminderAppMenuBarState {
@@ -45,20 +48,33 @@ class ReminderAppMenuBar extends React.Component<IReminderAppMenuBarProps, IRemi
         return (
             <Mui.AppBar>
                 <Mui.Toolbar color="white">
-                <Mui.IconButton
-                    className={this.props.classes.menuButton}
-                    color="inherit"
-                    aria-label="Menu"
-                    onClick={this.handleOpenMenuClick}
-                    >
-                    <MenuIcon />
-                </Mui.IconButton>
-                <Mui.Typography
-                    className={this.props.classes.flex}
-                    variant="title"
-                    color="inherit">
-                    Reminders
-                </Mui.Typography>
+                    <Mui.IconButton
+                        className={this.props.classes.menuButton}
+                        color="inherit"
+                        aria-label="Menu"
+                        onClick={this.handleOpenMenuClick}>
+                        <MenuIcon />
+                    </Mui.IconButton>
+                    <Mui.Typography
+                        className={this.props.classes.flex}
+                        variant="title"
+                        color="inherit">
+                        Reminders
+                    </Mui.Typography>
+                    {this.props.isLoggedIn ? (
+                        <Mui.Button
+                            color="inherit"
+                            onClick={this.handleLogoutClick}>
+                            Log Out
+                        </Mui.Button>
+                    ) : (
+                        <Mui.Button
+                            color="inherit"
+                            onClick={this.handleLoginClick}>
+                            Log In / Register
+                        </Mui.Button>
+                    )}
+
                 </Mui.Toolbar>
                 <ReminderAppMenu
                     anchorEl={this.state.anchorEl}
@@ -68,6 +84,18 @@ class ReminderAppMenuBar extends React.Component<IReminderAppMenuBarProps, IRemi
                 />
             </Mui.AppBar>
         );
+    }
+
+    private readonly handleLogoutClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        if (typeof this.props.onLogout === 'function') {
+            this.props.onLogout();
+        }
+    }
+
+    private readonly handleLoginClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        if (typeof this.props.onLogin === 'function') {
+            this.props.onLogin();
+        }
     }
 
     /**

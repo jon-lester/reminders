@@ -19,7 +19,7 @@ namespace JL.Reminders.Data
 			this.connectionStringFactory = connectionStringFactory;
 		}
 
-		public async Task<long> AddReminderAsync(long userId, Reminder reminder)
+		public async Task<long> AddReminderAsync(string userId, Reminder reminder)
 		{
 			using (MySqlConnection conn = new MySqlConnection(connectionStringFactory.GetConnectionString()))
 			{
@@ -58,7 +58,7 @@ namespace JL.Reminders.Data
 			}
 		}
 
-		public async Task<bool> DeleteReminderAsync(long userId, long reminderId)
+		public async Task<bool> DeleteReminderAsync(string userId, long reminderId)
 		{
 			using (MySqlConnection conn = new MySqlConnection(connectionStringFactory.GetConnectionString()))
 			{
@@ -72,7 +72,7 @@ namespace JL.Reminders.Data
 			}
 		}
 
-		public async Task<Reminder> GetReminderByIdAsync(long userId, long reminderId)
+		public async Task<Reminder> GetReminderByIdAsync(string userId, long reminderId)
 		{
 			using (MySqlConnection conn = new MySqlConnection(connectionStringFactory.GetConnectionString()))
 			{
@@ -85,7 +85,7 @@ namespace JL.Reminders.Data
 			}
 		}
 
-		public async Task<IEnumerable<Reminder>> GetRemindersByUserIdAsync(long userId)
+		public async Task<IEnumerable<Reminder>> GetRemindersByUserIdAsync(string userId)
 		{
 			using (MySqlConnection conn = new MySqlConnection(connectionStringFactory.GetConnectionString()))
 			{
@@ -97,7 +97,7 @@ namespace JL.Reminders.Data
 			}
 		}
 
-		public async Task<bool> UpdateReminderAsync(long userId, Reminder reminder)
+		public async Task<bool> UpdateReminderAsync(string userId, Reminder reminder)
 		{
 			using (MySqlConnection conn = new MySqlConnection(connectionStringFactory.GetConnectionString()))
 			{
@@ -124,7 +124,7 @@ namespace JL.Reminders.Data
 			}
 		}
 
-		public async Task<bool> UpdateReminderLastActionedAsync(long userId, long reminderId, DateTime lastActioned)
+		public async Task<bool> UpdateReminderLastActionedAsync(string userId, long reminderId, DateTime lastActioned)
 		{
 			using (MySqlConnection conn = new MySqlConnection(connectionStringFactory.GetConnectionString()))
 			{

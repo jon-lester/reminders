@@ -5,6 +5,8 @@ import IAddReminderRequest from '../model/IAddReminderRequest';
 import IReminder from '../model/IReminder';
 import IReminderOptions from '../model/IReminderOptions';
 
+import { IWithAuthServiceProps, withAuthService } from '../services/AuthService';
+
 export interface IWithApiProps {
     onGetOptions: () => Promise<IReminderOptions>;
     onGetAllReminders: () => Promise<IReminder[]>;
@@ -14,14 +16,15 @@ export interface IWithApiProps {
 
 export const withApi = <P extends object>(Component: React.ComponentType<P & IWithApiProps>) => {
 
-    return class ApiComponent extends React.Component<P & IWithApiProps> {
+    return withAuthService(class ApiService extends
+        React.Component<P & IWithApiProps & IWithAuthServiceProps> {
 
-        private static readonly API_BASE_URL = 'http://localhost:49900/';
+        private static readonly API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
         // private static readonly API_BASE_URL = 'https://2d410672-d82b-4642-918f-d96db1e140e1.mock.pstmn.io/';
 
         private static reminderOptions: IReminderOptions | undefined = undefined;
 
-        constructor(props: P & IWithApiProps) {
+        constructor(props: P & IWithApiProps & IWithAuthServiceProps) {
             super(props);
         }
 
@@ -34,56 +37,65 @@ export const withApi = <P extends object>(Component: React.ComponentType<P & IWi
                 {...this.props}/>;
         }
 
-        private getOptions = () => {
-            if (ApiComponent.reminderOptions) {
-                return Promise.resolve(ApiComponent.reminderOptions);
+        private readonly makeHeaders = (withJsonContentType: boolean = false): Headers => {
+            const headers = new Headers();
+
+            const accessToken = this.props.onGetAccessToken();
+
+            if (accessToken) {
+                headers.append('Authorization', `Bearer ${accessToken}`);
+            }
+
+            if (withJsonContentType) {
+                headers.append('Content-Type', 'application/json');
+            }
+
+            return headers;
+        }
+
+        private readonly getOptions = () => {
+            if (ApiService.reminderOptions) {
+                return Promise.resolve(ApiService.reminderOptions);
             } else {
                 console.log('Making API call for options..');
-                return fetch(this.makeUri('api/reminders/options'))
+                return fetch(this.makeUri('api/reminders/options'), {
+                    headers: this.makeHeaders()
+                })
                 .then(response => response.json())
                 .then(json => json);
             }
         }
 
-        private getAllReminders = () => {
-            return fetch(this.makeUri('api/reminders'))
-                .then(response => response.json())
-                .then(json => {
-                    return json;
-                });
+        private readonly getAllReminders = () => {
+            return fetch(this.makeUri('api/reminders'), {
+                headers: this.makeHeaders()
+            })
+            .then(response => response.json())
+            .then(json => {
+                return json;
+            });
         }
 
-        private addReminder = (addReminderRequest: IAddReminderRequest): Promise<number> => {
-
-            const headers = new Headers();
-            headers.append('Content-Type', 'application/json');
+        private readonly addReminder = (addReminderRequest: IAddReminderRequest): Promise<number> => {
 
             // todo - handle errors, and get the id for the new record
             // from the location header to return from this function
             return fetch(this.makeUri('api/reminders'), {
                 body: JSON.stringify(addReminderRequest),
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
+                headers: this.makeHeaders(true),
                 method: 'POST'
             })
             .then(response => response.json)
             .then(json => 0); // todo - extract the id from the location header
         }
 
-        private actionReminder = (addReminderActionRequest: IAddReminderActionRequest): Promise<boolean> => {
-            const headers = new Headers();
-            headers.append('Content-Type', 'application/json');
+        private readonly actionReminder = (addReminderActionRequest: IAddReminderActionRequest): Promise<boolean> => {
 
             // todo - handle errors, and get the id for the new record
             // from the location header to return from this function
             return fetch(this.makeUri(`api/reminders/${addReminderActionRequest.reminderId}/actions`), {
                 body: JSON.stringify(addReminderActionRequest),
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
+                headers: this.makeHeaders(true),
                 method: 'POST'
             })
             .then(response => response.json)
@@ -91,7 +103,7 @@ export const withApi = <P extends object>(Component: React.ComponentType<P & IWi
         }
 
         private makeUri(endpoint: string) {
-            return `${ApiComponent.API_BASE_URL}${endpoint}`;
+            return `${ApiService.API_BASE_URL}${endpoint}`;
         }
-    };
+    });
 }

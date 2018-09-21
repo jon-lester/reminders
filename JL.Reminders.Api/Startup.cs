@@ -1,10 +1,11 @@
 ﻿using System;
-
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 using AutoMapper;
 using Swashbuckle.AspNetCore.Swagger;
@@ -33,10 +34,28 @@ namespace JL.Reminders.Api
 				{
 					builder
 						.WithOrigins("http://localhost:3000")
-						.WithHeaders("Content-Type")
+						.WithHeaders("Content-Type", "Authorization")
 						.WithMethods("GET", "POST", "PUT", "DELETE");
 				});
 			});
+
+			services.AddAuthentication(authOptions =>
+	        {
+		        authOptions.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+		        authOptions.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+	        })
+		        .AddJwtBearer(bearerOptions =>
+		        {
+			        bearerOptions.Authority = Configuration.GetSection("Authorisation")["Authority"];
+			        bearerOptions.Audience = Configuration.GetSection("Authorisation")["Audience"];
+					bearerOptions.TokenValidationParameters = new TokenValidationParameters
+			        {
+						ValidateIssuerSigningKey = true,
+				        ValidateAudience = true,
+				        ValidateIssuer = true,
+				        ValidateLifetime = true
+			        };
+		        });
 
 			services.AddMvc(mvcOptions =>
 		        {
@@ -72,6 +91,8 @@ namespace JL.Reminders.Api
 		            c.SwaggerEndpoint("/swagger/v1/swagger.json", "Reminders v1");
 				});
 			}
+
+	        app.UseAuthentication();
 
 	        app.UseMvc();
 
