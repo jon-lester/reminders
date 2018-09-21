@@ -1,0 +1,33 @@
+# Config file to serve SPA + API using the Caddy webserver
+
+reminders.jonlester.me {
+		
+		# the SPA static content lives at /var/www/[sitename]
+        root /var/www/reminders.jonlester.me
+		
+		# let's compress served content
+        gzip
+		
+		# keep web logs in /var/log/caddy, and make sure they stay at a
+		# sensible size
+        log /var/log/caddy/reminders.jonlester.me.log {
+                rotate_size 50
+                rotate_age 90
+                rotate_keep 5
+                rotate_compress
+        }
+
+		# proxy the dotnet core kestrel server running the API on port 5000,
+		# and serve it from /api
+		proxy /api localhost:5000 {
+                transparent # forward all headers to kestrel
+				header_downstream -server # remove outgoing 'server: Kestrel'
+        }
+		
+		# rewrite ummatched paths which are not API requests to site-root for
+		# React's client-side routing to resolve
+        rewrite {
+                if {path} not_match ^/api
+                to {path} /
+        }
+}

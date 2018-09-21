@@ -1,0 +1,36 @@
+# systemd unit file to run the dotnet core API as a linux service
+
+# note: setup goes something like this..:
+# sudo useradd -s /usr/sbin/nologin -r reminders
+# sudo mkdir /opt/reminders
+# sudo chown reminders:reminders /opt/reminders
+# sudo chmod 774 /opt/reminders
+# sudo install -o root -g root -m 0664 path/to/this/file /etc/systemd/system/reminders-api.service
+# sudo systemctl enable reminders-api.service
+# sudo systemctl start reminders-api.service
+# sudo systemctl status reminders-api.service
+# .. and ..
+# journalctl -fu reminders-api
+
+[Unit]
+Description=Dotnet WebAPI backend for Reminders SPA
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/reminders
+ExecStart=/usr/bin/dotnet /opt/reminders/JL.Reminders.Api.dll
+Restart=always
+RestartSec=10
+KillSignal=SIGINT
+SyslogIdentifier=reminders-api
+User=reminders
+
+# set up environment variables for db access
+# note: password literal must be escaped per systemd-escape '<password>'
+Environment=REMINDERS_MYSQL_SERVER=127.0.0.1
+Environment=REMINDERS_MYSQL_SCHEMA=reminders
+Environment=REMINDERS_MYSQL_USER=reminders
+Environment=REMINDERS_MYSQL_PASSWORD=<MYSQL PASSWORD GOES HERE>
+
+[Install]
+WantedBy=multi-user.target
