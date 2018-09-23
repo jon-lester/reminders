@@ -11,23 +11,38 @@ reminders.jonlester.me {
 		# keep web logs in /var/log/caddy, and make sure they stay at a
 		# sensible size
         log /var/log/caddy/reminders.jonlester.me.log {
-                rotate_size 50
-                rotate_age 90
-                rotate_keep 5
-                rotate_compress
+			rotate_size 50
+			rotate_age 90
+			rotate_keep 5
+			rotate_compress
         }
 
+		# add some standard security headers
+		header / {
+			# HSTS - force https
+			Strict-Transport-Security "max-age=31536000;"
+			# only allow content from the local domain, apart from fonts and related css
+			# (vanilla React's styling requires "style-src 'unsafe-inline'" - need a solution for this)
+			Content-Security-Policy "default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src 'self' fonts.gstatic.com;"
+			# block XSS attacks
+			X-XSS-Protection "1; mode=block"
+			# prevent MIME-sniffing
+			X-Content-Type-Options "nosniff"
+			# deny iframing
+			X-Frame-Options "DENY"
+		}
+		
 		# proxy the dotnet core kestrel server running the API on port 5000,
 		# and serve it from /api
 		proxy /api localhost:5000 {
-                transparent # forward all headers to kestrel
-				header_downstream -server # remove outgoing 'server: Kestrel'
+			transparent # forward all headers to kestrel
+			header_downstream -server # remove outgoing 'server: Kestrel'
         }
 		
 		# rewrite ummatched paths which are not API requests to site-root for
 		# React's client-side routing to resolve
         rewrite {
-                if {path} not_match ^/api
-                to {path} /
+			if {path} not_match ^/api
+			to {path} /
         }
 }
