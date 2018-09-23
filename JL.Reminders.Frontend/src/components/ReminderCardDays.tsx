@@ -2,22 +2,28 @@ import * as Mui from '@material-ui/core';
 import { createStyles, withStyles } from '@material-ui/core/styles';
 import * as React from 'react';
 
+import Urgency from '../model/Urgency';
+
 const styles = () => createStyles({
     time: {
     },
     timeImminent: {
         color: 'orange'
     },
+    timeNow: {
+        color: 'blue'
+    },
     timeOverdue: {
         color: 'red'
     },
     timeSoon: {
-        color: 'yellow'
+        color: '#ffcc00'
     }
 });
 
 interface IReminderCardDaysProps extends Mui.WithStyles<typeof styles> {
     days: number;
+    urgency: Urgency;
 }
 
 class ReminderCardDays extends React.PureComponent<IReminderCardDaysProps> {
@@ -27,26 +33,20 @@ class ReminderCardDays extends React.PureComponent<IReminderCardDaysProps> {
                 className = {this.getClass()}
                 align = "center"
                 variant = "display4">
-            {this.props.days}
-        </Mui.Typography>
+                {this.props.days}
+            </Mui.Typography>
         )
     }
 
-    private readonly getClass = () => {
+    private readonly getClass = (): string => {
         
-        if (this.props.days < 0) {
-            return this.props.classes.timeOverdue;
+        switch (this.props.urgency) {
+            case Urgency.Imminent: return this.props.classes.timeImminent;
+            case Urgency.Now: return this.props.classes.timeNow;
+            case Urgency.Soon: return this.props.classes.timeSoon;
+            case Urgency.Overdue: return this.props.classes.timeOverdue;
+            default: return this.props.classes.time;
         }
-
-        if (this.props.days <= 7) {
-            return this.props.classes.timeImminent;
-        }
-
-        if (this.props.days <= 30) {
-            return this.props.classes.timeSoon;
-        }
-
-        return this.props.classes.time;
     }
 }
 

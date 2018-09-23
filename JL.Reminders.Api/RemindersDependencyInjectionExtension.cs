@@ -13,8 +13,8 @@ namespace JL.Reminders.Api
 			serviceCollection.AddSingleton<IDateTimeService, DateTimeService>();
 			serviceCollection.AddSingleton<IConnectionStringFactory, ConnectionStringFactory>();
 			serviceCollection.AddSingleton<IRemindersRepository, RemindersRepository>();
-			//serviceCollection.AddSingleton<IRemindersRepository, MockRemindersRepository>();
-			serviceCollection.AddSingleton<IReminderCalculationService, ReminderCalculationService>();
+			serviceCollection.AddSingleton<IUserPreferencesRepository, MockUserPreferencesRepository>();
+			serviceCollection.AddSingleton<IReminderHydrationService, ReminderHydrationService>();
 			serviceCollection.AddSingleton<IRemindersService, RemindersService>();
 		}
 	}

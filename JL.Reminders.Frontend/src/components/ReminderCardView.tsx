@@ -14,16 +14,16 @@ const styles = () => createStyles({
     }
 });
 
-interface IReminderCardContainerProps extends Mui.WithStyles<typeof styles> {
+interface IReminderCardViewProps extends Mui.WithStyles<typeof styles> {
     reminders: IReminder[];
     onAddReminder?: () => void;
     onMarkActioned?: (reminder: IReminder) => void;
     onMarkArchived?: (reminder: IReminder) => void;
 }
 
-class ReminderCardContainer extends React.Component<IReminderCardContainerProps> {
+class ReminderCardView extends React.Component<IReminderCardViewProps> {
 
-    constructor(props: IReminderCardContainerProps) {
+    constructor(props: IReminderCardViewProps) {
         super(props);
     }
 
@@ -56,4 +56,4 @@ class ReminderCardContainer extends React.Component<IReminderCardContainerProps>
     }
 }
 
-export default withStyles(styles)(ReminderCardContainer);
+export default withStyles(styles)(ReminderCardView);

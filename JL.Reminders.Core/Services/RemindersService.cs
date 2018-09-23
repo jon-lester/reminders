@@ -5,7 +5,8 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-
+using AutoMapper;
+using JL.Reminders.Core.Entities;
 using JL.Reminders.Core.Model;
 using JL.Reminders.Core.Repositories;
 
@@ -14,27 +15,25 @@ namespace JL.Reminders.Core.Services
 	public class RemindersService : IRemindersService
 	{
 		private readonly IRemindersRepository remindersRepository;
-		private readonly IReminderCalculationService reminderCalculationService;
+		private readonly IReminderHydrationService reminderHydrationService;
+		private readonly IUserPreferencesRepository userPreferencesRepository;
 
 		public RemindersService(
 			IRemindersRepository remindersRepository,
-			IReminderCalculationService reminderCalculationService)
+			IReminderHydrationService reminderHydrationService,
+			IUserPreferencesRepository userPreferencesRepository)
 		{
 			this.remindersRepository = remindersRepository;
-			this.reminderCalculationService = reminderCalculationService;
+			this.reminderHydrationService = reminderHydrationService;
+			this.userPreferencesRepository = userPreferencesRepository;
 		}
 
 		public async Task<IEnumerable<Reminder>> GetRemindersByUserIdAsync(string userId)
 		{
 			var reminders = (await this.remindersRepository.GetRemindersByUserIdAsync(userId)).ToList();
+			var userPreferences = await this.userPreferencesRepository.GetUserPreferencesAsync(userId);
 
-			foreach (var reminder in reminders)
-			{
-				reminder.DaysToGo = reminderCalculationService.CalculateDaysToGo(reminder);
-				reminder.SubTitle = GetReminderSubtitle(reminder);
-			}
-
-			return reminders;
+			return reminders.Select(r => reminderHydrationService.HydrateReminder(r, userPreferences.UrgencyConfiguration)).ToList();
 		}
 
 		public Task<ReminderOptions> GetReminderOptions()
@@ -51,14 +50,15 @@ namespace JL.Reminders.Core.Services
 		public async Task<Reminder> GetReminderByIdAsync(string userId, long reminderId)
 		{
 			var reminder = await this.remindersRepository.GetReminderByIdAsync(userId, reminderId);
-			reminder.DaysToGo = reminderCalculationService.CalculateDaysToGo(reminder);
-			reminder.SubTitle = GetReminderSubtitle(reminder);
-			return reminder;
+			var userPreferences = await this.userPreferencesRepository.GetUserPreferencesAsync(userId);
+
+			return reminderHydrationService?.HydrateReminder(reminder, userPreferences.UrgencyConfiguration);
 		}
 
 		public async Task<long> AddReminderAsync(string userId, Reminder reminder)
 		{
-			return await this.remindersRepository.AddReminderAsync(userId, reminder);
+			return await this.remindersRepository.AddReminderAsync(userId,
+				Mapper.Map<Reminder, ReminderEntity>(reminder, opts => opts.ConfigureMap(MemberList.Destination)));
 		}
 
 		public async Task<bool> DeleteReminderAsync(string userId, long reminderId)
@@ -68,7 +68,8 @@ namespace JL.Reminders.Core.Services
 
 		public async Task<bool> UpdateReminderAsync(string userId, Reminder reminder)
 		{
-			return await this.remindersRepository.UpdateReminderAsync(userId, reminder);
+			return await this.remindersRepository.UpdateReminderAsync(userId,
+				Mapper.Map<Reminder, ReminderEntity>(reminder, opts => opts.ConfigureMap(MemberList.Destination)));
 		}
 
 		public async Task<bool> ActionReminderAsync(string userId, ReminderAction action)
@@ -82,61 +83,15 @@ namespace JL.Reminders.Core.Services
 			}
 
 			// get the next due date
-			var reminder = await this.remindersRepository.GetReminderByIdAsync(userId, action.ReminderId);
+			var reminder = await this.GetReminderByIdAsync(userId, action.ReminderId);
 
 			if (reminder == null)
 			{
 				return false;
 			}
 
-			var nextDue = this.reminderCalculationService.CalculateNextDueDate(reminder);
-
 			// set it as the last-actioned date
-			return await this.remindersRepository.UpdateReminderLastActionedAsync(userId, action.ReminderId, nextDue);
-		}
-
-		private string GetReminderSubtitle(Reminder r)
-		{
-			switch (r.Recurrence)
-			{
-				case Recurrence.Annual:
-					return $"Annual on {GetOrdinal(r.ForDate.Day)} {r.ForDate:MMM}.";
-				case Recurrence.Monthly:
-					return $"{GetOrdinal(r.ForDate.Day)} of each month.";
-				case Recurrence.OneOff:
-					return $"{GetOrdinal(r.ForDate.Day)} {r.ForDate:MMMM, yyyy}";
-				case Recurrence.Quarterly:
-					return $"Quarterly from {GetOrdinal(r.ForDate.Day)} {r.ForDate:MMM}.";
-				case Recurrence.SixMonthly:
-					return $"{GetOrdinal(r.ForDate.Day)} of {r.ForDate:MMM} and {r.ForDate.AddMonths(6):MMM}.";
-				default:
-					return String.Empty;
-			}
-		}
-
-		private string GetOrdinal(int number)
-		{
-			return $"{number}{GetOrdinalIndicator(number)}";
-		}
-
-		private string GetOrdinalIndicator(int number)
-		{
-			if (number == 1 || number == 21 || number == 31)
-			{
-				return "st";
-			}
-
-			if (number == 2 || number == 22 || number == 32)
-			{
-				return "nd";
-			}
-
-			if (number == 3 || number == 23)
-			{
-				return "rd";
-			}
-
-			return "th";
+			return await this.remindersRepository.UpdateReminderLastActionedAsync(userId, reminder.Id, reminder.NextDueDate);
 		}
 
 		/// <summary>

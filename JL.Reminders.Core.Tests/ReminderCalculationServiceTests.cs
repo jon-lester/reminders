@@ -1,21 +1,32 @@
 using System;
 using System.Linq;
+
+using Moq;
 using Xunit;
 
+using JL.Reminders.Core.Entities;
 using JL.Reminders.Core.Model;
 using JL.Reminders.Core.Services;
-using Moq;
 
 namespace JL.Reminders.Core.Tests
 {
 	public class ReminderCalculationServiceTests
 	{
-		private ReminderCalculationService GetUut(DateTime fakeNow)
+		private ReminderHydrationService GetUut(DateTime fakeNow)
 		{
 			Mock<IDateTimeService> dateTimeServiceMock = new Mock<IDateTimeService>();
 			dateTimeServiceMock.Setup(m => m.GetCurrentDateTime()).Returns(fakeNow);
 
-			return new ReminderCalculationService(dateTimeServiceMock.Object);
+			return new ReminderHydrationService(dateTimeServiceMock.Object);
+		}
+
+		private UrgencyConfiguration GetUrgencyConfiguration()
+		{
+			return new UrgencyConfiguration
+			{
+				ImminentDays = 7,
+				SoonDays = 14
+			};
 		}
 
 		[Fact]
@@ -24,16 +35,16 @@ namespace JL.Reminders.Core.Tests
 			DateTime reminderFor = new DateTime(2018, 6, 15);
 			DateTime now = new DateTime(2018, 6, 1);
 
-			Reminder r = new Reminder
+			ReminderEntity r = new ReminderEntity
 			{
 				Recurrence = Recurrence.Annual,
 				ForDate = reminderFor,
 				LastActioned = null
 			};
 
-			int dtg = GetUut(now).CalculateDaysToGo(r);
+			var hydrated = GetUut(now).HydrateReminder(r, GetUrgencyConfiguration());
 
-			Assert.Equal(14, dtg);
+			Assert.Equal(14, hydrated.DaysToGo);
 		}
 
 		[Fact]
@@ -42,16 +53,16 @@ namespace JL.Reminders.Core.Tests
 			DateTime reminderFor = new DateTime(2018, 5, 1);
 			DateTime now = new DateTime(2018, 6, 1);
 
-			Reminder r = new Reminder
+			ReminderEntity r = new ReminderEntity
 			{
 				Recurrence = Recurrence.Annual,
 				ForDate = reminderFor,
 				LastActioned = null
 			};
 
-			int dtg = GetUut(now).CalculateDaysToGo(r);
+			var hydrated = GetUut(now).HydrateReminder(r, GetUrgencyConfiguration());
 
-			Assert.Equal(-31, dtg);
+			Assert.Equal(-31, hydrated.DaysToGo);
 		}
 
 		[Theory]
@@ -64,14 +75,14 @@ namespace JL.Reminders.Core.Tests
 		{
 			DateTime forDate = new DateTime(2018, 09, 05);
 
-			var nextDue = GetUut(new DateTime(2018, 1, 1)).CalculateNextDueDate(new Reminder
+			var hydrated = GetUut(new DateTime(2018, 1, 1)).HydrateReminder(new ReminderEntity
 			{
 				Recurrence = recurrence,
 				ForDate = forDate,
 				LastActioned = null
-			});
+			}, GetUrgencyConfiguration());
 
-			Assert.Equal(forDate, nextDue);
+			Assert.Equal(hydrated.ForDate, hydrated.NextDueDate);
 		}
 
 		[Theory]
@@ -85,14 +96,14 @@ namespace JL.Reminders.Core.Tests
 		{
 			DateTime forDate = new DateTime(2018, 09, 05);
 
-			var nextDue = GetUut(new DateTime(2018, 10, 1)).CalculateNextDueDate(new Reminder
+			var hydrated = GetUut(new DateTime(2018, 10, 1)).HydrateReminder(new ReminderEntity
 			{
 				Recurrence = Recurrence.OneOff,
 				ForDate = forDate,
 				LastActioned = new DateTime(lastActionedYear, lastActionedMonth, lastActionedDay)
-			});
+			}, GetUrgencyConfiguration());
 
-			Assert.Equal(forDate, nextDue);
+			Assert.Equal(hydrated.ForDate, hydrated.NextDueDate);
 		}
 
 		[Theory]
@@ -109,14 +120,14 @@ namespace JL.Reminders.Core.Tests
 		{
 			DateTime forDate = new DateTime(2018, 09, 05);
 
-			var nextDue = GetUut(new DateTime(2018, 1, 1)).CalculateNextDueDate(new Reminder
+			var hydrated = GetUut(new DateTime(2018, 1, 1)).HydrateReminder(new ReminderEntity
 			{
 				Recurrence = recurrence,
 				ForDate = forDate,
 				LastActioned = forDate
-			});
+			}, GetUrgencyConfiguration());
 
-			Assert.Equal(new DateTime(expectedNextDueYear, expectedNextDueMonth, expectedNextDueDay), nextDue);
+			Assert.Equal(new DateTime(expectedNextDueYear, expectedNextDueMonth, expectedNextDueDay), hydrated.NextDueDate);
 		}
 
 		[Theory]
@@ -136,14 +147,14 @@ namespace JL.Reminders.Core.Tests
 		{
 			DateTime forDate = new DateTime(2018, 09, 05);
 
-			var nextDue = GetUut(new DateTime(2018, 1, 1)).CalculateNextDueDate(new Reminder
+			var hydrated = GetUut(new DateTime(2018, 1, 1)).HydrateReminder(new ReminderEntity
 			{
 				Recurrence = recurrence,
 				ForDate = forDate,
 				LastActioned = new DateTime(lastActionedYear, lastActionedMonth, lastActionedDay)
-			});
+			}, GetUrgencyConfiguration());
 
-			Assert.Equal(new DateTime(expectedNextDueYear, expectedNextDueMonth, expectedNextDueDay), nextDue);
+			Assert.Equal(new DateTime(expectedNextDueYear, expectedNextDueMonth, expectedNextDueDay), hydrated.NextDueDate);
 		}
 	}
 }

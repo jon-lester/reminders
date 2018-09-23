@@ -5,7 +5,7 @@ import * as React from 'react';
 import { IWithApiProps, withApi } from '../services/ApiService';
 
 import AddReminderModal from './AddReminderModal';
-import ReminderCardContainer from './ReminderCardContainer';
+import ReminderCardView from './ReminderCardView';
 
 import IAddReminderRequest from '../model/IAddReminderRequest';
 import IReminder from '../model/IReminder';
@@ -38,7 +38,7 @@ class ReminderApp extends React.Component<{} & IWithApiProps, IAppState> {
     public render() {
         return (
             <React.Fragment>
-                <ReminderCardContainer
+                <ReminderCardView
                     reminders={this.state.reminders}
                     onMarkActioned={this.handleMarkActioned}
                     onMarkArchived={this.handleMarkArchived}

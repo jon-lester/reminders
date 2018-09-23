@@ -4,16 +4,39 @@ import * as React from 'react';
 import { createStyles, withStyles } from '@material-ui/core/styles';
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 
+import Urgency from '../model/Urgency';
+
 import IMenuItem from '../model/IMenuItem';
 import IReminder from '../model/IReminder';
 import ReminderAppMenu from './ReminderAppMenu';
 import ReminderCardDays from './ReminderCardDays';
 
-const styles = () => createStyles({
-    card: {
+const styles = () => {
+
+    const card = {
         width: 250
-    }
-});
+    };
+
+    return createStyles({
+        card,
+        cardImminent: {
+            ...card,
+            backgroundColor: 'rgba(255, 165, 0, 0.1)'
+        },
+        cardNow: {
+            ...card,
+            backgroundColor: 'rgba(0, 0, 255, 0.1)'
+        },
+        cardOverdue: {
+            ...card,
+            backgroundColor: 'rgba(255, 0, 0, 0.1)'
+        },
+        cardSoon: {
+            ...card,
+            backgroundColor: 'rgba(255, 255, 0, 0.1)'
+        },
+    });
+};
 
 interface IReminderCardProps extends Mui.WithStyles<typeof styles> {
     onMarkActioned?: (reminder: IReminder) => void,
@@ -59,7 +82,7 @@ class ReminderCard extends React.Component<IReminderCardProps & Mui.WithStyles<t
 
         return (
             <div>
-            <Mui.Card className={this.props.classes.card}>
+            <Mui.Card className={this.getCardClass()}>
                 <Mui.CardHeader
                     title = {formattedReminder.title ? formattedReminder.title : 'Untitled'}
                     subheader = {formattedReminder.subTitle}
@@ -67,12 +90,25 @@ class ReminderCard extends React.Component<IReminderCardProps & Mui.WithStyles<t
                                 <MoreVertIcon />
                             </Mui.IconButton>}/>
                 <Mui.CardContent>
-                    <ReminderCardDays days={this.props.reminder.daysToGo} />
+                    <ReminderCardDays
+                        days={this.props.reminder.daysToGo}
+                        urgency={this.props.reminder.urgency}
+                    />
                 </Mui.CardContent>
             </Mui.Card>
             <ReminderAppMenu open={this.state.menuOpen} onClosed={this.handleMenuClosed} menuItems={this.menuItems} anchorEl={this.state.menuElement} />
             </div>
         );
+    }
+
+    private readonly getCardClass = (): string => {
+        switch (this.props.reminder.urgency) {
+            case Urgency.Imminent: return this.props.classes.cardImminent;
+            case Urgency.Now: return this.props.classes.cardNow;
+            case Urgency.Soon: return this.props.classes.cardSoon;
+            case Urgency.Overdue: return this.props.classes.cardOverdue;
+            default: return this.props.classes.card;
+        }
     }
 
     private readonly getFormattedReminderProp = (): IReminder => {
@@ -82,15 +118,19 @@ class ReminderCard extends React.Component<IReminderCardProps & Mui.WithStyles<t
             description: this.props.reminder.description,
             forDate: this.props.reminder.forDate,
             id: this.props.reminder.id,
+            imminentDaysPreference: this.props.reminder.imminentDaysPreference,
             importance: this.props.reminder.importance,
             lastActioned: this.props.reminder.lastActioned,
+            nextDueDate: this.props.reminder.nextDueDate,
             recurrence: this.props.reminder.recurrence,
+            soonDaysPreference: this.props.reminder.soonDaysPreference,
             subTitle: this.props.reminder.subTitle,
             title: this.props.reminder.title
                 ? (this.props.reminder.title.length > 16
                     ? this.props.reminder.title.substr(0, 14) + '..'
                     : this.props.reminder.title)
-                : 'Untitled'
+                : 'Untitled',
+            urgency: this.props.reminder.urgency
         };
     }
 

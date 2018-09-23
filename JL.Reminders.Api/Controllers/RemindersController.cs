@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +14,6 @@ using AutoMapper;
 using JL.Reminders.Api.Models;
 using JL.Reminders.Core.Model;
 using JL.Reminders.Core.Services;
-using Microsoft.AspNetCore.Authorization;
 
 namespace JL.Reminders.Api.Controllers
 {
@@ -123,7 +123,7 @@ namespace JL.Reminders.Api.Controllers
 	    public async Task<IActionResult> UpdateReminder(int id, [FromBody] PostNewReminderModel postNewReminder)
 	    {
 		    var obj = Mapper.Map<Reminder>(postNewReminder);
-		    obj.ID = id;
+		    obj.Id = id;
 
 			var success = await this.remindersService.UpdateReminderAsync(CurrentUserId, obj);
 

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
+
+using JL.Reminders.Core.Entities;
 using JL.Reminders.Core.Model;
 using JL.Reminders.Core.Repositories;
 
@@ -9,7 +10,7 @@ namespace JL.Reminders.Data
 {
 	public class MockRemindersRepository : IRemindersRepository
 	{
-		public Task<long> AddReminderAsync(string userId, Reminder reminder)
+		public Task<long> AddReminderAsync(string userId, ReminderEntity reminder)
 		{
 			return Task.FromResult(1L);
 		}
@@ -19,58 +20,52 @@ namespace JL.Reminders.Data
 			return Task.FromResult(true);
 		}
 
-		public Task<Reminder> GetReminderByIdAsync(string userId, long reminderId)
+		public Task<ReminderEntity> GetReminderByIdAsync(string userId, long reminderId)
 		{
-			return Task.FromResult(new Reminder());
+			return Task.FromResult(new ReminderEntity());
 		}
 
-		public Task<IEnumerable<Reminder>> GetRemindersByUserIdAsync(string userId)
+		public Task<IEnumerable<ReminderEntity>> GetRemindersByUserIdAsync(string userId)
 		{
-			return Task.FromResult(new List<Reminder>
+			return Task.FromResult(new List<ReminderEntity>
 			{
-				new Reminder
+				new ReminderEntity
 				{
 					Recurrence = Recurrence.Annual,
 					ForDate = DateTime.UtcNow,
 					LastActioned = null,
 					Description = "Annual reminder 1",
-					DaysToGo = 0,
 					Importance = Importance.Important,
 					Title = "Annual 1",
-					SubTitle = "Annual reminder",
 					Created = DateTime.UtcNow,
-					ID = 1
+					Id = 1
 				},
-				new Reminder
+				new ReminderEntity
 				{
 					Recurrence = Recurrence.Annual,
 					ForDate = DateTime.UtcNow,
 					LastActioned = null,
 					Description = "Annual reminder 2",
-					DaysToGo = 0,
 					Importance = Importance.Important,
 					Title = "Annual 2",
-					SubTitle = "Annual reminder",
 					Created = DateTime.UtcNow,
-					ID = 2
+					Id = 2
 				},
-				new Reminder
+				new ReminderEntity
 				{
 					Recurrence = Recurrence.Annual,
 					ForDate = DateTime.UtcNow,
 					LastActioned = null,
 					Description = "Annual reminder 3",
-					DaysToGo = 0,
 					Importance = Importance.Important,
 					Title = "Annual 3",
-					SubTitle = "Annual reminder",
 					Created = DateTime.UtcNow,
-					ID = 3
+					Id = 3
 				}
-			} as IEnumerable<Reminder>);
+			} as IEnumerable<ReminderEntity>);
 		}
 
-		public Task<bool> UpdateReminderAsync(string userId, Reminder reminder)
+		public Task<bool> UpdateReminderAsync(string userId, ReminderEntity reminder)
 		{
 			return Task.FromResult(true);
 		}

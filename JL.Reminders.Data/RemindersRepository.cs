@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Dapper;
 using MySql.Data.MySqlClient;
 
-using JL.Reminders.Core.Model;
+using JL.Reminders.Core.Entities;
 using JL.Reminders.Core.Repositories;
 
 namespace JL.Reminders.Data
@@ -19,7 +19,7 @@ namespace JL.Reminders.Data
 			this.connectionStringFactory = connectionStringFactory;
 		}
 
-		public async Task<long> AddReminderAsync(string userId, Reminder reminder)
+		public async Task<long> AddReminderAsync(string userId, ReminderEntity reminder)
 		{
 			using (MySqlConnection conn = new MySqlConnection(connectionStringFactory.GetConnectionString()))
 			{
@@ -72,11 +72,11 @@ namespace JL.Reminders.Data
 			}
 		}
 
-		public async Task<Reminder> GetReminderByIdAsync(string userId, long reminderId)
+		public async Task<ReminderEntity> GetReminderByIdAsync(string userId, long reminderId)
 		{
 			using (MySqlConnection conn = new MySqlConnection(connectionStringFactory.GetConnectionString()))
 			{
-				return await conn.QueryFirstOrDefaultAsync<Reminder>("SELECT ID, UserID, Title, Description, ForDate, Created, Recurrence, Importance, LastActioned FROM reminders WHERE UserID = @userId AND ID = @id;",
+				return await conn.QueryFirstOrDefaultAsync<ReminderEntity>("SELECT ID, UserID, Title, Description, ForDate, Created, Recurrence, Importance, LastActioned FROM reminders WHERE UserID = @userId AND ID = @id;",
 					new
 					{
 						userId,
@@ -85,11 +85,11 @@ namespace JL.Reminders.Data
 			}
 		}
 
-		public async Task<IEnumerable<Reminder>> GetRemindersByUserIdAsync(string userId)
+		public async Task<IEnumerable<ReminderEntity>> GetRemindersByUserIdAsync(string userId)
 		{
 			using (MySqlConnection conn = new MySqlConnection(connectionStringFactory.GetConnectionString()))
 			{
-				return await conn.QueryAsync<Reminder>("SELECT ID, UserID, Title, Description, ForDate, Created, Recurrence, Importance, LastActioned FROM reminders WHERE UserID = @userId;",
+				return await conn.QueryAsync<ReminderEntity>("SELECT ID, UserID, Title, Description, ForDate, Created, Recurrence, Importance, LastActioned FROM reminders WHERE UserID = @userId;",
 					new
 					{
 						userId
@@ -97,7 +97,7 @@ namespace JL.Reminders.Data
 			}
 		}
 
-		public async Task<bool> UpdateReminderAsync(string userId, Reminder reminder)
+		public async Task<bool> UpdateReminderAsync(string userId, ReminderEntity reminder)
 		{
 			using (MySqlConnection conn = new MySqlConnection(connectionStringFactory.GetConnectionString()))
 			{
@@ -116,7 +116,7 @@ namespace JL.Reminders.Data
 						fordate = reminder.ForDate,
 						recurrence = reminder.Recurrence,
 						importance = reminder.Importance,
-						id = reminder.ID,
+						id = reminder.Id,
 						userId
 					});
 
