@@ -8,7 +8,8 @@ namespace JL.Reminders.Api.Validators
 	{
 		public PostNewActionModelValidator()
 		{
-			RuleFor(m => m.ReminderId).GreaterThan(0)
+			RuleFor(m => m.ReminderId)
+				.GreaterThan(0)
 				.WithMessage($"{nameof(PostNewActionModel.ReminderId)} must be a valid reminder ID.");
 		}
 	}

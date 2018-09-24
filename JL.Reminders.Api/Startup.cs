@@ -35,7 +35,7 @@ namespace JL.Reminders.Api
 					builder
 						.WithOrigins("http://localhost:3000")
 						.WithHeaders("Content-Type", "Authorization")
-						.WithMethods("GET", "POST", "PUT", "DELETE");
+						.WithMethods("GET", "POST", "PUT", "DELETE", "PATCH");
 				});
 			});
 

@@ -8,10 +8,14 @@ import IReminderOptions from '../model/IReminderOptions';
 import { IWithAuthServiceProps, withAuthService } from '../services/AuthService';
 
 export interface IWithApiProps {
-    onGetOptions: () => Promise<IReminderOptions>;
-    onGetAllReminders: () => Promise<IReminder[]>;
-    onAddReminder: (addReminderRequest: IAddReminderRequest) => Promise<number>;
-    onActionReminder: (addReminderActionRequest: IAddReminderActionRequest) => Promise<boolean>;
+    api: {
+        onActionReminder: (addReminderActionRequest: IAddReminderActionRequest) => Promise<boolean>;
+        onAddReminder: (addReminderRequest: IAddReminderRequest) => Promise<number>;
+        onArchiveReminder: (reminderId: number) => Promise<boolean>;
+        onGetAllReminders: () => Promise<IReminder[]>;
+        onGetOptions: () => Promise<IReminderOptions>;
+        onUnarchiveReminder: (reminderId: number) => Promise<boolean>;
+    }
 }
 
 export const withApi = <P extends object>(Component: React.ComponentType<P & IWithApiProps>) => {
@@ -29,11 +33,18 @@ export const withApi = <P extends object>(Component: React.ComponentType<P & IWi
         }
 
         public render() {
+
+            const api = {
+                onActionReminder: this.actionReminder,
+                onAddReminder: this.addReminder,
+                onArchiveReminder: this.archiveReminder,
+                onGetAllReminders: this.getAllReminders,
+                onGetOptions: this.getOptions,
+                onUnarchiveReminder: this.unarchiveReminder
+            }
+
             return <Component
-                onGetOptions={this.getOptions}
-                onGetAllReminders={this.getAllReminders}
-                onAddReminder={this.addReminder}
-                onActionReminder={this.actionReminder}
+                api={api}
                 {...this.props}/>;
         }
 
@@ -57,7 +68,6 @@ export const withApi = <P extends object>(Component: React.ComponentType<P & IWi
             if (ApiService.reminderOptions) {
                 return Promise.resolve(ApiService.reminderOptions);
             } else {
-                console.log('Making API call for options..');
                 return fetch(this.makeUri('api/reminders/options'), {
                     headers: this.makeHeaders()
                 })
@@ -100,6 +110,30 @@ export const withApi = <P extends object>(Component: React.ComponentType<P & IWi
             })
             .then(response => response.json)
             .then(json => true); // todo - extract whether or not success from return code
+        }
+
+        private readonly archiveReminder = (reminderId: number): Promise<boolean> => {
+            return fetch(this.makeUri(`api/reminders/${reminderId}`), {
+                body: JSON.stringify({
+                    status: 1
+                }),
+                headers: this.makeHeaders(true),
+                method: 'PATCH'
+            })
+            .then(response => response.json)
+            .then(json => true);
+        }
+
+        private readonly unarchiveReminder = (reminderId: number): Promise<boolean> => {
+            return fetch(this.makeUri(`api/reminders/${reminderId}`), {
+                body: JSON.stringify({
+                    status: 0
+                }),
+                headers: this.makeHeaders(true),
+                method: 'PATCH'
+            })
+            .then(response => response.json)
+            .then(json => true);
         }
 
         private makeUri(endpoint: string) {

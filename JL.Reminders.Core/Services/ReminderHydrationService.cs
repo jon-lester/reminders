@@ -1,4 +1,5 @@
 ﻿using System;
+
 using AutoMapper;
 
 using JL.Reminders.Core.Entities;
@@ -40,7 +41,7 @@ namespace JL.Reminders.Core.Services
 				return reminder.ForDate;
 			}
 
-			Func<DateTime, DateTime> increment = null;
+			Func<DateTime, DateTime> increment;
 
 			switch (reminder.Recurrence)
 			{
@@ -110,7 +111,7 @@ namespace JL.Reminders.Core.Services
 				imminentDays = reminder.ImminentDaysPreference.Value;
 			}
 
-			Urgency urgency = default(Urgency);
+			Urgency urgency;
 
 			if (reminder.DaysToGo < 0)
 			{

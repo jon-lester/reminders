@@ -7,6 +7,7 @@ using MySql.Data.MySqlClient;
 
 using JL.Reminders.Core.Entities;
 using JL.Reminders.Core.Repositories;
+using JL.Reminders.Core.Model;
 
 namespace JL.Reminders.Data
 {
@@ -85,15 +86,33 @@ namespace JL.Reminders.Data
 			}
 		}
 
-		public async Task<IEnumerable<ReminderEntity>> GetRemindersByUserIdAsync(string userId)
+		public async Task<IEnumerable<ReminderEntity>> GetRemindersByUserIdAsync(string userId, ReminderStatus status = ReminderStatus.Active)
 		{
 			using (MySqlConnection conn = new MySqlConnection(connectionStringFactory.GetConnectionString()))
 			{
-				return await conn.QueryAsync<ReminderEntity>("SELECT ID, UserID, Title, Description, ForDate, Created, Recurrence, Importance, LastActioned FROM reminders WHERE UserID = @userId;",
+				return await conn.QueryAsync<ReminderEntity>("SELECT ID, UserID, Title, Description, ForDate, Created, Recurrence, Importance, LastActioned FROM reminders WHERE UserID = @userId AND Status = @status;",
 					new
 					{
-						userId
+						userId,
+						status = (int)status
 					});
+			}
+		}
+
+		public async Task<bool> SetReminderStatusAsync(string userId, long reminderId, ReminderStatus status)
+		{
+			using (MySqlConnection conn = new MySqlConnection(connectionStringFactory.GetConnectionString()))
+			{
+				var updated = await conn.ExecuteAsync(
+					@"UPDATE reminders SET Status = @status WHERE ID = @id AND UserID = @userId;",
+					new
+					{
+						id = reminderId,
+						userId,
+						status = (int)status,
+					});
+
+				return updated > 0;
 			}
 		}
 

@@ -16,5 +16,6 @@ namespace JL.Reminders.Core.Entities
 		public DateTime? LastActioned { get; set; }
 		public int? SoonDaysPreference { get; set; }
 		public int? ImminentDaysPreference { get; set; }
+		public ReminderStatus Status { get; set; }
 	}
 }

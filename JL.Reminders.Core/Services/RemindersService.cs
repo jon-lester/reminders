@@ -5,7 +5,9 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+
 using AutoMapper;
+
 using JL.Reminders.Core.Entities;
 using JL.Reminders.Core.Model;
 using JL.Reminders.Core.Repositories;
@@ -28,9 +30,9 @@ namespace JL.Reminders.Core.Services
 			this.userPreferencesRepository = userPreferencesRepository;
 		}
 
-		public async Task<IEnumerable<Reminder>> GetRemindersByUserIdAsync(string userId)
+		public async Task<IEnumerable<Reminder>> GetRemindersByUserIdAsync(string userId, ReminderStatus status)
 		{
-			var reminders = (await this.remindersRepository.GetRemindersByUserIdAsync(userId)).ToList();
+			var reminders = (await this.remindersRepository.GetRemindersByUserIdAsync(userId, status)).ToList();
 			var userPreferences = await this.userPreferencesRepository.GetUserPreferencesAsync(userId);
 
 			return reminders.Select(r => reminderHydrationService.HydrateReminder(r, userPreferences.UrgencyConfiguration)).ToList();
@@ -92,6 +94,11 @@ namespace JL.Reminders.Core.Services
 
 			// set it as the last-actioned date
 			return await this.remindersRepository.UpdateReminderLastActionedAsync(userId, reminder.Id, reminder.NextDueDate);
+		}
+
+		public async Task<bool> SetReminderStatusAsync(string userId, long reminderId, ReminderStatus status)
+		{
+			return await this.remindersRepository.SetReminderStatusAsync(userId, reminderId, status);
 		}
 
 		/// <summary>

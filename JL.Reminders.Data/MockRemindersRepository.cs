@@ -25,7 +25,7 @@ namespace JL.Reminders.Data
 			return Task.FromResult(new ReminderEntity());
 		}
 
-		public Task<IEnumerable<ReminderEntity>> GetRemindersByUserIdAsync(string userId)
+		public Task<IEnumerable<ReminderEntity>> GetRemindersByUserIdAsync(string userId, ReminderStatus status)
 		{
 			return Task.FromResult(new List<ReminderEntity>
 			{
@@ -63,6 +63,11 @@ namespace JL.Reminders.Data
 					Id = 3
 				}
 			} as IEnumerable<ReminderEntity>);
+		}
+
+		public Task<bool> SetReminderStatusAsync(string userId, long reminderId, ReminderStatus status)
+		{
+			return Task.FromResult(true);
 		}
 
 		public Task<bool> UpdateReminderAsync(string userId, ReminderEntity reminder)

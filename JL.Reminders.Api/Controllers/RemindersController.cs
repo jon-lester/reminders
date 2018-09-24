@@ -1,19 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-
 using AutoMapper;
-
 using JL.Reminders.Api.Models;
 using JL.Reminders.Core.Model;
 using JL.Reminders.Core.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 
 namespace JL.Reminders.Api.Controllers
 {
@@ -31,7 +25,7 @@ namespace JL.Reminders.Api.Controllers
 		    this.remindersService = remindersService;
 	    }
 
-	    private string CurrentUserId => this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+	    private string CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier);
 
 		/// <summary>
 		/// Fetch all reminders for the current user.
@@ -40,7 +34,7 @@ namespace JL.Reminders.Api.Controllers
 		[HttpGet]
 		public async Task<IActionResult> GetAllReminders()
 		{
-			var reminders = await this.remindersService.GetRemindersByUserIdAsync(CurrentUserId);
+			var reminders = await remindersService.GetRemindersByUserIdAsync(CurrentUserId, ReminderStatus.Active);
 
 			return Ok(reminders);
 		}
@@ -53,7 +47,7 @@ namespace JL.Reminders.Api.Controllers
 	    [Route("options")]
 	    public async Task<IActionResult> GetOptions()
 	    {
-		    var reminderOptions = await this.remindersService.GetReminderOptions();
+		    var reminderOptions = await remindersService.GetReminderOptions();
 
 		    return Ok(reminderOptions);
 	    }
@@ -67,7 +61,7 @@ namespace JL.Reminders.Api.Controllers
 	    [Route("{id}")]
 		public async Task<IActionResult> GetReminder(long id)
 	    {
-			var reminder = await this.remindersService.GetReminderByIdAsync(CurrentUserId, id);
+			var reminder = await remindersService.GetReminderByIdAsync(CurrentUserId, id);
 
 		    if (reminder == null)
 		    {
@@ -85,7 +79,7 @@ namespace JL.Reminders.Api.Controllers
 	    [HttpPost]
 	    public async Task<IActionResult> PostReminder([FromBody] PostNewReminderModel postNewReminder)
 	    {
-			var reminderId = await this.remindersService.AddReminderAsync(CurrentUserId, Mapper.Map<Reminder>(postNewReminder));
+			var reminderId = await remindersService.AddReminderAsync(CurrentUserId, Mapper.Map<Reminder>(postNewReminder));
 
 		    return Created($"{Request.Path.ToString()}/{reminderId}", null);
 		}
@@ -102,7 +96,7 @@ namespace JL.Reminders.Api.Controllers
 		    try
 		    {
 			    var success =
-				    await this.remindersService.ActionReminderAsync(CurrentUserId, Mapper.Map<ReminderAction>(postNewAction));
+				    await remindersService.ActionReminderAsync(CurrentUserId, Mapper.Map<ReminderAction>(postNewAction));
 
 			    return success ? (IActionResult)Ok() : NotFound();
 			}
@@ -125,7 +119,28 @@ namespace JL.Reminders.Api.Controllers
 		    var obj = Mapper.Map<Reminder>(postNewReminder);
 		    obj.Id = id;
 
-			var success = await this.remindersService.UpdateReminderAsync(CurrentUserId, obj);
+			var success = await remindersService.UpdateReminderAsync(CurrentUserId, obj);
+
+		    if (!success)
+		    {
+			    return NotFound();
+		    }
+
+		    return Ok();
+	    }
+
+		/// <summary>
+		/// Set the active/archived status of an existing reminder.
+		/// </summary>
+		/// <param name="id">The ID of the reminder to set status for.</param>
+		/// <param name="patchReminderStatus">A <see cref="PatchReminderStatusModel"/> containing the new status.</param>
+		/// <returns>200 if success, otherwise 404.</returns>
+	    [HttpPatch]
+	    [Route("{id}")]
+	    public async Task<IActionResult> UpdateReminderStatus(int id, [FromBody] PatchReminderStatusModel patchReminderStatus)
+	    {
+		    var success =
+			    await remindersService.SetReminderStatusAsync(CurrentUserId, id, patchReminderStatus.Status);
 
 		    if (!success)
 		    {
@@ -144,7 +159,7 @@ namespace JL.Reminders.Api.Controllers
 	    [Route("{id}")]
 	    public async Task<IActionResult> DeleteReminder(long id)
 	    {
-		    var success = await this.remindersService.DeleteReminderAsync(CurrentUserId, id);
+		    var success = await remindersService.DeleteReminderAsync(CurrentUserId, id);
 
 		    if (!success)
 		    {

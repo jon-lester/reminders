@@ -8,6 +8,7 @@ namespace JL.Reminders.Core.Model
 	    public string Title { get; set; }
 	    public string SubTitle { get; set; }
 		public string Description { get; set; }
+		public ReminderStatus Status { get; set; }
 
 	    public DateTime ForDate { get; set; }
 	    public DateTime Created { get; set; }

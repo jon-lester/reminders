@@ -89,9 +89,9 @@ class ReminderApp extends React.Component<{} & IWithApiProps, IAppState> {
      */
     public componentDidMount() {
 
-        this.props.onGetOptions()
+        this.props.api.onGetOptions()
             .then(options => {
-                return Promise.all([options, this.props.onGetAllReminders()])
+                return Promise.all([options, this.props.api.onGetAllReminders()])
             })
             .then(results => {
                 this.setState({
@@ -114,7 +114,7 @@ class ReminderApp extends React.Component<{} & IWithApiProps, IAppState> {
     }
 
     private readonly refreshAllReminders = () => {
-        this.props.onGetAllReminders()
+        this.props.api.onGetAllReminders()
             .then(reminders => this.setState({reminders: reminders.sort((a, b) => a.daysToGo - b.daysToGo)}))
             // tslint:disable-next-line:no-console
             .catch(reason => console.log(reason));
@@ -154,7 +154,7 @@ class ReminderApp extends React.Component<{} & IWithApiProps, IAppState> {
      * Handle the user having requested to save a new reminder.
      */
     private readonly handleAddReminderDialogSave = (saveRequest: IAddReminderRequest) => {
-        this.props.onAddReminder(saveRequest)
+        this.props.api.onAddReminder(saveRequest)
             .then((id: number) => {
                 this.showToast(`${saveRequest.title} was added.`);
                 this.refreshAllReminders();
@@ -167,7 +167,7 @@ class ReminderApp extends React.Component<{} & IWithApiProps, IAppState> {
      */
     private readonly handleMarkActioned = (reminder: IReminder) => {
 
-        this.props.onActionReminder({
+        this.props.api.onActionReminder({
             notes: '',
             reminderId: reminder.id
         }).then(success => {
@@ -179,8 +179,13 @@ class ReminderApp extends React.Component<{} & IWithApiProps, IAppState> {
     /**
      * Handle the user having requested to archive an existing reminder.
      */
-    private readonly handleMarkArchived = (reminder: IReminder) =>
-        this.showToast(`${reminder.title} was archived.`);
+    private readonly handleMarkArchived = (reminder: IReminder) => {
+        this.props.api.onArchiveReminder(reminder.id)
+        .then(success => {
+            this.showToast(`${reminder.title} was archived.`);
+            this.refreshAllReminders();
+        });
+    }
 
     /**
      * Show a toast message via the SnackBar component.
