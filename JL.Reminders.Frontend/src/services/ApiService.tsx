@@ -43,9 +43,12 @@ export const withApi = <P extends object>(Component: React.ComponentType<P & IWi
                 onUnarchiveReminder: this.unarchiveReminder
             }
 
-            return <Component
-                api={api}
-                {...this.props}/>;
+            return (
+                <Component
+                    api={api}
+                    {...this.props}
+                />
+            );
         }
 
         private readonly makeHeaders = (withJsonContentType: boolean = false): Headers => {

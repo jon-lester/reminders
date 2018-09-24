@@ -4,6 +4,7 @@ import { Route, Switch } from 'react-router-dom';
 
 import { IWithAuthServiceProps, withAuthService } from './services/AuthService';
 
+import AboutModal from './components/AboutModal';
 import AuthCallbackComponent from './components/AuthCallbackComponent';
 import HomeView from './components/HomeView';
 import ReminderApp from './components/ReminderApp';
@@ -11,17 +12,30 @@ import ReminderAppMenuBar from './components/ReminderAppMenuBar';
 
 import IMenuItem from './model/IMenuItem';
 
-class App extends React.Component<IWithAuthServiceProps> {
+interface IAppState {
+    aboutModalOpen: boolean;
+}
+
+class App extends React.Component<IWithAuthServiceProps, IAppState> {
 
     private readonly menuItems: IMenuItem[];
 
     constructor(props: any) {
         super(props);
 
+        this.state = {
+            aboutModalOpen: false
+        };
+
         // set up items for the main menu.
         this.menuItems = [
             {
-                action: () => console.log('action 2'),
+                action: () => {
+                    this.setState({
+                        ...this.state,
+                        aboutModalOpen: true
+                    });
+                },
                 id: 2,
                 text: 'About'
             }];
@@ -44,8 +58,22 @@ class App extends React.Component<IWithAuthServiceProps> {
                     }
                     <Route component={HomeView} />
                 </Switch>
+                <AboutModal
+                    open={this.state.aboutModalOpen}
+                    onClose={this.handleAboutModalClosed}
+                />
             </React.Fragment>
         );
+    }
+
+    /**
+     * Handle the user having close the About modal.
+     */
+    private readonly handleAboutModalClosed = () => {
+        this.setState({
+            ...this.state,
+            aboutModalOpen: false
+        });
     }
 }
 
