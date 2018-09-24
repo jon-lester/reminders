@@ -1,6 +1,11 @@
 import * as Mui from '@material-ui/core/';
 import * as React from 'react';
 
+import blue from '@material-ui/core/colors/blue';
+import orange from '@material-ui/core/colors/orange';
+import red from '@material-ui/core/colors/red';
+import yellow from '@material-ui/core/colors/yellow';
+
 import { createStyles, withStyles } from '@material-ui/core/styles';
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 
@@ -21,19 +26,19 @@ const styles = () => {
         card,
         cardImminent: {
             ...card,
-            backgroundColor: 'rgba(255, 165, 0, 0.1)'
+            backgroundColor: orange[50]
         },
         cardNow: {
             ...card,
-            backgroundColor: 'rgba(0, 0, 255, 0.1)'
+            backgroundColor: blue[50] // 'rgba(0, 0, 255, 0.1)'
         },
         cardOverdue: {
             ...card,
-            backgroundColor: 'rgba(255, 0, 0, 0.1)'
+            backgroundColor: red[50]
         },
         cardSoon: {
             ...card,
-            backgroundColor: 'rgba(255, 255, 0, 0.1)'
+            backgroundColor: yellow[50]
         },
     });
 };
@@ -82,8 +87,9 @@ class ReminderCard extends React.Component<IReminderCardProps & Mui.WithStyles<t
 
         return (
             <div>
-            <Mui.Card className={this.getCardClass()}>
+            <Mui.Card>
                 <Mui.CardHeader
+                    className={this.getCardClass()}
                     title = {formattedReminder.title ? formattedReminder.title : 'Untitled'}
                     subheader = {formattedReminder.subTitle}
                     action={<Mui.IconButton onClick={this.handleMenuOpen}>

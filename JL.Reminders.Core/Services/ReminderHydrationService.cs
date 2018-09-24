@@ -72,7 +72,9 @@ namespace JL.Reminders.Core.Services
 
 		private int CalculateDaysToGo(Reminder reminder)
 		{
-			return (int) Math.Floor((CalculateNextDueDate(reminder) - dateTimeService.GetCurrentDateTime()).TotalDays);
+			var nextDueDate = CalculateNextDueDate(reminder);
+			var currentDate = dateTimeService.GetCurrentDateTime();
+			return (int) Math.Round((nextDueDate - currentDate).TotalDays);
 		}
 
 		private string GetReminderSubtitle(Reminder r)

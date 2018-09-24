@@ -5,7 +5,7 @@ import { Route, Switch } from 'react-router-dom';
 import { IWithAuthServiceProps, withAuthService } from './services/AuthService';
 
 import AuthCallbackComponent from './components/AuthCallbackComponent';
-import HomePage from './components/HomePage';
+import HomeView from './components/HomeView';
 import ReminderApp from './components/ReminderApp';
 import ReminderAppMenuBar from './components/ReminderAppMenuBar';
 
@@ -17,16 +17,6 @@ class App extends React.Component<IWithAuthServiceProps> {
 
     constructor(props: any) {
         super(props);
-        this.state = {
-            addDialogOpen: false,
-            reminderOptions: {
-                importances: {},
-                recurrences: {}
-            },
-            reminders: [],
-            snackbarMessage: undefined,
-            snackbarOpen: false
-        };
 
         // set up items for the main menu.
         this.menuItems = [
@@ -52,7 +42,7 @@ class App extends React.Component<IWithAuthServiceProps> {
                     { this.props.onCheckAuthenticated() &&
                         <Route path="/app" component={ReminderApp} />
                     }
-                    <Route component={HomePage} />
+                    <Route component={HomeView} />
                 </Switch>
             </React.Fragment>
         );
