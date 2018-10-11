@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-using JL.Reminders.Core.Model;
+using JL.Reminders.Core.Entities;
 
 namespace JL.Reminders.Core.Repositories
 {
 	public interface IUserPreferencesRepository
 	{
-		Task<UserPreferences> GetUserPreferencesAsync(string userId);
-		Task SetUserPreferencesAsync(string userId, UserPreferences preferences);
+		Task<PreferencesEntity> GetUserPreferencesAsync(string userId);
+		Task<bool> SetUserPreferencesAsync(PreferencesEntity preferences);
 	}
 }

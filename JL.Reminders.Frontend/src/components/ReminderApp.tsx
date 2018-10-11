@@ -2,43 +2,69 @@ import Snackbar from '@material-ui/core/Snackbar';
 import Typography from '@material-ui/core/Typography';
 import * as React from 'react';
 
-import { IWithApiProps, withApi } from '../services/ApiService';
+import { withApi, WithApiServiceProps } from '../services/ApiService';
 
 import AddReminderModal from './AddReminderModal';
 import ErrorView from './ErrorView';
 import LoadingView from './LoadingView';
 import ReminderCardView from './ReminderCardView';
-import ViewContainer from './ViewContainer';
+import SettingsModal from './SettingsModal';
+import ViewWrapper from './ViewWrapper';
 
 import AppState from '../model/AppState';
 import IAddReminderRequest from '../model/IAddReminderRequest';
+import IMenuItem from '../model/IMenuItem';
 import IReminder from '../model/IReminder';
 import IReminderOptions from '../model/IReminderOptions';
+import IUrgencyConfiguration from '../model/IUrgencyConfiguration';
+import IUserPreferences from '../model/IUserPreferences';
 
-export interface IAppState {
-    addDialogOpen: boolean;
+interface IReminderAppState {
+    addReminderModalOpen: boolean;
     appState: AppState;
     reminders: IReminder[];
     reminderOptions: IReminderOptions;
+    settingsModalOpen: boolean;
     snackbarMessage: string | undefined;
     snackbarOpen: boolean;
+    userSettings: IUserPreferences;
 }
 
-class ReminderApp extends React.Component<{} & IWithApiProps, IAppState> {
+interface IReminderAppProps {
+    onConfigureAppMenu: (menuItems: IMenuItem[]) => void;
+}
 
-    constructor(props: any) {
-        super(props);
+class ReminderApp extends React.Component<WithApiServiceProps<IReminderAppProps>, IReminderAppState> {
+
+    constructor(props: IReminderAppProps) {
+        super(props as any);
         this.state = {
-            addDialogOpen: false,
+            addReminderModalOpen: false,
             appState: AppState.Loading,
             reminderOptions: {
                 importances: {},
                 recurrences: {}
             },
             reminders: [],
+            settingsModalOpen: false,
             snackbarMessage: undefined,
-            snackbarOpen: false
+            snackbarOpen: false,
+            userSettings: {
+                urgencyConfiguration: {
+                    imminentDays: 7,
+                    soonDays: 30
+                }
+            }
         };
+
+        this.props.onConfigureAppMenu([{
+            action: () => {
+                this.setState({
+                    settingsModalOpen: true
+                });
+            },
+            text: "Settings"
+        }]);
     }
 
     public render() {
@@ -54,6 +80,8 @@ class ReminderApp extends React.Component<{} & IWithApiProps, IAppState> {
                             onMarkActioned={this.handleMarkActioned}
                             onMarkArchived={this.handleMarkArchived}
                             onAddReminder={this.handleAddReminder}
+                            imminentDays={this.state.userSettings.urgencyConfiguration.imminentDays}
+                            soonDays={this.state.userSettings.urgencyConfiguration.soonDays}
                         />
                 break;
             case AppState.Error:
@@ -62,16 +90,23 @@ class ReminderApp extends React.Component<{} & IWithApiProps, IAppState> {
 
         return (
             <React.Fragment>
-                <ViewContainer>
+                <ViewWrapper>
                     {view}
-                </ViewContainer>
-                {!this.state.addDialogOpen ||
+                </ViewWrapper>
+                {!this.state.addReminderModalOpen ||
                 <AddReminderModal
                     importanceOptions={this.state.reminderOptions.importances}
                     occurrenceOptions={this.state.reminderOptions.recurrences}
-                    onClose={this.handleAddReminderDialogClosed}
-                    onSave={this.handleAddReminderDialogSave}
-                    open={this.state.addDialogOpen}
+                    onClose={this.handleAddReminderModalClosed}
+                    onSave={this.handleAddReminderModalSave}
+                    open={this.state.addReminderModalOpen}
+                />}
+                {!this.state.settingsModalOpen ||
+                <SettingsModal
+                    open={this.state.settingsModalOpen}
+                    onSave={this.handleSettingsModalSave}
+                    onCancel={this.handleSettingsModalCancel}
+                    urgencyConfiguration={this.state.userSettings.urgencyConfiguration}
                 />}
                 <Snackbar
                     autoHideDuration={3000}
@@ -89,8 +124,30 @@ class ReminderApp extends React.Component<{} & IWithApiProps, IAppState> {
      */
     public componentDidMount() {
 
+        Promise.all([
+            this.props.api.onGetOptions(),
+            this.props.api.onGetUserSettings(),
+            this.props.api.onGetAllReminders()
+        ])
+        .then(results => {
+            this.setState({
+                ...this.state,
+                appState: AppState.Loaded,
+                reminderOptions: results[0],
+                reminders: results[2].sort((a, b) => a.daysToGo - b.daysToGo),
+                userSettings: results[1]
+            });
+        })
+        .catch(reason => {
+            console.log(reason);
+            this.setState({
+                ...this.state,
+                appState: AppState.Error
+            });
+        });
+
         this.props.api.onGetOptions()
-            .then(options => {
+            .then((options) => {
                 return Promise.all([options, this.props.api.onGetAllReminders()])
             })
             .then(results => {
@@ -110,12 +167,12 @@ class ReminderApp extends React.Component<{} & IWithApiProps, IAppState> {
                 });
             });
 
-        this.refreshAllReminders();
+        // this.refreshAllReminders();
     }
 
     private readonly refreshAllReminders = () => {
         this.props.api.onGetAllReminders()
-            .then(reminders => this.setState({reminders: reminders.sort((a, b) => a.daysToGo - b.daysToGo)}))
+            .then((reminders: IReminder[]) => this.setState({reminders: reminders.sort((a: IReminder, b: IReminder) => a.daysToGo - b.daysToGo)}))
             // tslint:disable-next-line:no-console
             .catch(reason => console.log(reason));
     }
@@ -136,30 +193,46 @@ class ReminderApp extends React.Component<{} & IWithApiProps, IAppState> {
     private readonly handleAddReminder = () => {
         this.setState({
             ...this.state,
-            addDialogOpen: true
+            addReminderModalOpen: true
         });
     }
 
     /**
      * Handle the add-reminder modal requesting that it be closed.
      */
-    private readonly handleAddReminderDialogClosed = () => {
+    private readonly handleAddReminderModalClosed = () => {
         this.setState({
             ...this.state,
-            addDialogOpen: false
+            addReminderModalOpen: false
         });
     }
 
     /**
      * Handle the user having requested to save a new reminder.
      */
-    private readonly handleAddReminderDialogSave = (saveRequest: IAddReminderRequest) => {
+    private readonly handleAddReminderModalSave = (saveRequest: IAddReminderRequest) => {
         this.props.api.onAddReminder(saveRequest)
             .then((id: number) => {
                 this.showToast(`${saveRequest.title} was added.`);
                 this.refreshAllReminders();
             });
-        this.handleAddReminderDialogClosed();
+        this.handleAddReminderModalClosed();
+    }
+
+    private readonly handleSettingsModalSave = (urgencyConfiguration: IUrgencyConfiguration) => {
+        this.props.api.onSaveUserSettings({ urgencyConfiguration })
+            .then(result => {
+                this.setState({
+                    settingsModalOpen: false,
+                    userSettings: { urgencyConfiguration }
+                });
+            });
+    }
+
+    private readonly handleSettingsModalCancel = () => {
+        this.setState({
+            settingsModalOpen: false
+        });
     }
 
     /**

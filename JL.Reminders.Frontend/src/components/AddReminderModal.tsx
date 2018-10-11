@@ -3,11 +3,12 @@ import * as moment from 'moment';
 import * as React from 'react';
 
 import IAddReminderRequest from '../model/IAddReminderRequest';
+import IOptions from '../model/Options';
 
 interface IAddReminderDialogComponentProps {
     open: boolean;
-    occurrenceOptions: {[key: number]: string};
-    importanceOptions: {[key: number]: string};
+    occurrenceOptions: IOptions;
+    importanceOptions: IOptions;
     onClose(): void;
     onSave(addReminderRequest: IAddReminderRequest): void;
 }

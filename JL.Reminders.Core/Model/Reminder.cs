@@ -18,7 +18,6 @@ namespace JL.Reminders.Core.Model
 
 		public Recurrence Recurrence { get; set; }
 	    public Importance Importance { get; set; }
-	    public Urgency Urgency { get; set; }
 
 	    public int? SoonDaysPreference { get; set; }
 	    public int? ImminentDaysPreference { get; set; }

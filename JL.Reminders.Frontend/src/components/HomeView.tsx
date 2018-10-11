@@ -3,9 +3,9 @@ import { createStyles, withStyles } from '@material-ui/core/styles';
 import * as React from 'react';
 import { Redirect } from 'react-router';
 
-import ViewContainer from './ViewContainer';
+import ViewWrapper from './ViewWrapper';
 
-import { IWithAuthServiceProps, withAuthService } from '../services/AuthService';
+import { withAuthService, WithAuthServiceProps } from '../services/AuthService';
 
 const styles = () => createStyles({
     homePaper: {
@@ -20,11 +20,11 @@ const styles = () => createStyles({
     }
 });
 
-class HomeView extends React.PureComponent<Mui.WithStyles<typeof styles> & IWithAuthServiceProps> {
+class HomeView extends React.PureComponent<Mui.WithStyles<typeof styles> & WithAuthServiceProps> {
     public render() {
         return (
-            !this.props.onCheckAuthenticated() ? (
-            <ViewContainer>
+            !this.props.auth.onCheckAuthenticated() ? (
+            <ViewWrapper>
                 <Mui.Paper className={this.props.classes.homePaper}>
                     <Mui.Typography variant="display3">
                         Reminders
@@ -34,7 +34,7 @@ class HomeView extends React.PureComponent<Mui.WithStyles<typeof styles> & IWith
                         Version {process.env.REACT_APP_VERSION}
                     </Mui.Typography>
                 </Mui.Paper>
-            </ViewContainer>) : (
+            </ViewWrapper>) : (
                 <Redirect to="/app" />
             )
         );

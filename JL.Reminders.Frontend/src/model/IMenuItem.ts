@@ -4,7 +4,6 @@
  * display, and an action to carry out when clicked.
  */
 export default interface IMenuItem {
-    id: number;
     text: string;
     action: () => void;
 }

@@ -20,10 +20,12 @@ class ReminderAppMenu extends React.Component<IReminderAppMenuProps> {
 
         const menuItems = [];
 
+        let id = 0;
+
         for (const item of this.props.menuItems) {
             menuItems.push(
                 <Mui.MenuItem
-                    key={item.id}
+                    key={id++}
                     onClick={this.handleMenuItemClick(item.action)}>
                     {item.text}
                 </Mui.MenuItem>

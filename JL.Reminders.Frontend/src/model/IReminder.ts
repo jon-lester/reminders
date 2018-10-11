@@ -1,5 +1,3 @@
-import Urgency from './Urgency';
-
 /**
  * Represents a reminder item pulled from the API for
  * display as a reminder card.
@@ -18,7 +16,6 @@ export default interface IReminder {
 
     recurrence: number;
     importance: number;
-    urgency: Urgency;
 
     soonDaysPreference: number | null;
     imminentDaysPreference: number | null;

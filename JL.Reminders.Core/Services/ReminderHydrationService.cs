@@ -4,6 +4,7 @@ using AutoMapper;
 
 using JL.Reminders.Core.Entities;
 using JL.Reminders.Core.Model;
+using JL.Reminders.Core.Services.Interfaces;
 
 namespace JL.Reminders.Core.Services
 {
@@ -22,14 +23,13 @@ namespace JL.Reminders.Core.Services
 			this.dateTimeService = dateTimeService;
 		}
 
-		public Reminder HydrateReminder(ReminderEntity reminder, UrgencyConfiguration urgencyDefaults)
+		public Reminder HydrateReminder(ReminderEntity reminder)
 		{
 			Reminder hydratedReminder = Mapper.Map<ReminderEntity, Reminder>(reminder, opts => opts.ConfigureMap(MemberList.Source));
 
 			hydratedReminder.NextDueDate = CalculateNextDueDate(hydratedReminder);
 			hydratedReminder.DaysToGo = CalculateDaysToGo(hydratedReminder);
 			hydratedReminder.SubTitle = GetReminderSubtitle(hydratedReminder);
-			hydratedReminder.Urgency = CalculateUrgency(hydratedReminder, urgencyDefaults);
 
 			return hydratedReminder;
 		}
@@ -38,7 +38,7 @@ namespace JL.Reminders.Core.Services
 		{
 			if (reminder.Recurrence == Recurrence.OneOff || reminder.LastActioned == null)
 			{
-				return reminder.ForDate;
+				return reminder.ForDate.Date;
 			}
 
 			Func<DateTime, DateTime> increment;
@@ -61,7 +61,7 @@ namespace JL.Reminders.Core.Services
 					throw new NotImplementedException($"Recurrence type not implemented: {reminder.Recurrence.ToString()}");
 			}
 
-			DateTime nextDue = reminder.ForDate;
+			DateTime nextDue = reminder.ForDate.Date;
 
 			while (nextDue <= reminder.LastActioned.Value)
 			{
@@ -74,7 +74,7 @@ namespace JL.Reminders.Core.Services
 		private int CalculateDaysToGo(Reminder reminder)
 		{
 			var nextDueDate = CalculateNextDueDate(reminder);
-			var currentDate = dateTimeService.GetCurrentDateTime();
+			var currentDate = dateTimeService.GetCurrentDate();
 			return (int) Math.Round((nextDueDate - currentDate).TotalDays);
 		}
 
@@ -95,46 +95,6 @@ namespace JL.Reminders.Core.Services
 				default:
 					return String.Empty;
 			}
-		}
-
-		public Urgency CalculateUrgency(Reminder reminder, UrgencyConfiguration defaults)
-		{
-			// get the defaults to use
-			int soonDays = defaults.SoonDays;
-			int imminentDays = defaults.ImminentDays;
-
-			// if the reminder has a full configuration of its own,
-			// use those values instead
-			if (reminder.SoonDaysPreference != null && reminder.ImminentDaysPreference != null)
-			{
-				soonDays = reminder.SoonDaysPreference.Value;
-				imminentDays = reminder.ImminentDaysPreference.Value;
-			}
-
-			Urgency urgency;
-
-			if (reminder.DaysToGo < 0)
-			{
-				urgency = Urgency.Overdue;
-			}
-			else if (reminder.DaysToGo == 0)
-			{
-				urgency = Urgency.Now;
-			}
-			else if (reminder.DaysToGo <= imminentDays)
-			{
-				urgency = Urgency.Imminent;
-			}
-			else if (reminder.DaysToGo <= soonDays)
-			{
-				urgency = Urgency.Soon;
-			}
-			else
-			{
-				urgency = Urgency.Normal;
-			}
-
-			return urgency;
 		}
 
 		private string GetOrdinal(int number)

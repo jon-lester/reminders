@@ -22,8 +22,8 @@ const styles = (theme: Mui.Theme) => Mui.createStyles({
 
 interface IReminderAppMenuBarProps extends Mui.WithStyles<typeof styles> {
     menuItems: IMenuItem[],
-    onLogin?: () => {},
-    onLogout?: () => {},
+    onLogin?: () => void,
+    onLogout?: () => void,
     isLoggedIn: boolean;
 }
 

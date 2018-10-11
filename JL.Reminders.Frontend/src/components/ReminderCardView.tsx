@@ -26,6 +26,8 @@ interface IReminderCardViewProps extends Mui.WithStyles<typeof styles> {
     onAddReminder?: () => void;
     onMarkActioned?: (reminder: IReminder) => void;
     onMarkArchived?: (reminder: IReminder) => void;
+    soonDays: number;
+    imminentDays: number;
 }
 
 class ReminderCardView extends React.Component<IReminderCardViewProps> {
@@ -44,7 +46,10 @@ class ReminderCardView extends React.Component<IReminderCardViewProps> {
                     <ReminderCard
                         onMarkActioned={this.props.onMarkActioned}
                         onMarkArchived={this.props.onMarkArchived}
-                        reminder={reminder} />
+                        reminder={reminder}
+                        imminentDays={this.props.imminentDays}
+                        soonDays={this.props.soonDays}
+                    />
                 </Mui.Grid>
             );
         }

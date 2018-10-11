@@ -1,11 +1,11 @@
 import * as React from 'react';
 
-import { IWithAuthServiceProps, withAuthService } from '../services/AuthService';
+import { withAuthService, WithAuthServiceProps } from '../services/AuthService';
 
-class AuthCallbackComponent extends React.Component<IWithAuthServiceProps> {
+class AuthCallbackComponent extends React.Component<WithAuthServiceProps> {
 
     public componentDidMount() {
-        this.props.onHandleCallback();
+        this.props.auth.onHandleCallback();
     }
 
     public render() {

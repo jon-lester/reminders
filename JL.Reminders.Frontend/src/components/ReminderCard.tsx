@@ -9,10 +9,9 @@ import yellow from '@material-ui/core/colors/yellow';
 import { createStyles, withStyles } from '@material-ui/core/styles';
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 
-import Urgency from '../model/Urgency';
-
 import IMenuItem from '../model/IMenuItem';
 import IReminder from '../model/IReminder';
+import Urgency from '../model/Urgency';
 import ReminderAppMenu from './ReminderAppMenu';
 import ReminderCardDays from './ReminderCardDays';
 
@@ -44,9 +43,12 @@ const styles = () => {
 };
 
 interface IReminderCardProps extends Mui.WithStyles<typeof styles> {
-    onMarkActioned?: (reminder: IReminder) => void,
-    onMarkArchived?: (reminder: IReminder) => void,
-    reminder: IReminder,
+    imminentDays: number;
+    onMarkActioned?: (reminder: IReminder) => void;
+    onMarkArchived?: (reminder: IReminder) => void;
+    reminder: IReminder;
+    soonDays: number;
+
 }
 
 interface IReminderCardState {
@@ -70,13 +72,11 @@ class ReminderCard extends React.Component<IReminderCardProps & Mui.WithStyles<t
             action: () => this.props.onMarkActioned
                 ? this.props.onMarkActioned(this.props.reminder)
                 : {},
-            id: 1,
             text: 'Mark Actioned'
         }, {
             action: () => this.props.onMarkArchived
                 ? this.props.onMarkArchived(this.props.reminder)
                 : {},
-            id: 2,
             text: 'Archive'
         }];
     }
@@ -98,7 +98,7 @@ class ReminderCard extends React.Component<IReminderCardProps & Mui.WithStyles<t
                 <Mui.CardContent>
                     <ReminderCardDays
                         days={this.props.reminder.daysToGo}
-                        urgency={this.props.reminder.urgency}
+                        urgency={this.getUrgency()}
                     />
                 </Mui.CardContent>
             </Mui.Card>
@@ -107,8 +107,28 @@ class ReminderCard extends React.Component<IReminderCardProps & Mui.WithStyles<t
         );
     }
 
+    private readonly getUrgency = (): Urgency => {
+        if (this.props.reminder.daysToGo < 0) {
+            return Urgency.Overdue;
+        }
+
+        if (this.props.reminder.daysToGo === 0) {
+            return Urgency.Now;
+        }
+
+        if (this.props.reminder.daysToGo <= this.props.imminentDays) {
+            return Urgency.Imminent;
+        }
+
+        if (this.props.reminder.daysToGo <= this.props.soonDays) {
+            return Urgency.Soon;
+        }
+
+        return Urgency.Normal;
+    }
+
     private readonly getCardClass = (): string => {
-        switch (this.props.reminder.urgency) {
+        switch (this.getUrgency()) {
             case Urgency.Imminent: return this.props.classes.cardImminent;
             case Urgency.Now: return this.props.classes.cardNow;
             case Urgency.Soon: return this.props.classes.cardSoon;
@@ -135,8 +155,7 @@ class ReminderCard extends React.Component<IReminderCardProps & Mui.WithStyles<t
                 ? (this.props.reminder.title.length > 16
                     ? this.props.reminder.title.substr(0, 14) + '..'
                     : this.props.reminder.title)
-                : 'Untitled',
-            urgency: this.props.reminder.urgency
+                : 'Untitled'
         };
     }
 

@@ -2,8 +2,6 @@ import * as React from 'react';
 
 import { createStyles, withStyles, WithStyles } from '@material-ui/core/styles';
 
-interface IViewContainerProps extends WithStyles<typeof styles> {}
-
 const styles = () => createStyles({
     viewContainer: {
         marginTop: 72,
@@ -11,7 +9,7 @@ const styles = () => createStyles({
     }
 });
 
-class ViewContainer extends React.PureComponent<IViewContainerProps> {
+class ViewWrapper extends React.PureComponent<WithStyles<typeof styles>> {
     public render() {
         return (
             <div className={this.props.classes.viewContainer}>
@@ -21,4 +19,4 @@ class ViewContainer extends React.PureComponent<IViewContainerProps> {
     }
 }
 
-export default withStyles(styles)(ViewContainer);
+export default withStyles(styles)(ViewWrapper);

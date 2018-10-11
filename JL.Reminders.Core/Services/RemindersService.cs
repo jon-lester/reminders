@@ -11,6 +11,7 @@ using AutoMapper;
 using JL.Reminders.Core.Entities;
 using JL.Reminders.Core.Model;
 using JL.Reminders.Core.Repositories;
+using JL.Reminders.Core.Services.Interfaces;
 
 namespace JL.Reminders.Core.Services
 {
@@ -18,24 +19,20 @@ namespace JL.Reminders.Core.Services
 	{
 		private readonly IRemindersRepository remindersRepository;
 		private readonly IReminderHydrationService reminderHydrationService;
-		private readonly IUserPreferencesRepository userPreferencesRepository;
 
 		public RemindersService(
 			IRemindersRepository remindersRepository,
-			IReminderHydrationService reminderHydrationService,
-			IUserPreferencesRepository userPreferencesRepository)
+			IReminderHydrationService reminderHydrationService)
 		{
 			this.remindersRepository = remindersRepository;
 			this.reminderHydrationService = reminderHydrationService;
-			this.userPreferencesRepository = userPreferencesRepository;
 		}
 
 		public async Task<IEnumerable<Reminder>> GetRemindersByUserIdAsync(string userId, ReminderStatus status)
 		{
 			var reminders = (await this.remindersRepository.GetRemindersByUserIdAsync(userId, status)).ToList();
-			var userPreferences = await this.userPreferencesRepository.GetUserPreferencesAsync(userId);
 
-			return reminders.Select(r => reminderHydrationService.HydrateReminder(r, userPreferences.UrgencyConfiguration)).ToList();
+			return reminders.Select(r => reminderHydrationService.HydrateReminder(r)).ToList();
 		}
 
 		public Task<ReminderOptions> GetReminderOptions()
@@ -52,9 +49,8 @@ namespace JL.Reminders.Core.Services
 		public async Task<Reminder> GetReminderByIdAsync(string userId, long reminderId)
 		{
 			var reminder = await this.remindersRepository.GetReminderByIdAsync(userId, reminderId);
-			var userPreferences = await this.userPreferencesRepository.GetUserPreferencesAsync(userId);
 
-			return reminderHydrationService?.HydrateReminder(reminder, userPreferences.UrgencyConfiguration);
+			return reminderHydrationService?.HydrateReminder(reminder);
 		}
 
 		public async Task<long> AddReminderAsync(string userId, Reminder reminder)

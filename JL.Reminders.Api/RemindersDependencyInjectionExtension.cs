@@ -2,6 +2,7 @@
 
 using JL.Reminders.Core.Repositories;
 using JL.Reminders.Core.Services;
+using JL.Reminders.Core.Services.Interfaces;
 using JL.Reminders.Data;
 
 namespace JL.Reminders.Api
@@ -13,9 +14,10 @@ namespace JL.Reminders.Api
 			serviceCollection.AddSingleton<IDateTimeService, DateTimeService>();
 			serviceCollection.AddSingleton<IConnectionStringFactory, ConnectionStringFactory>();
 			serviceCollection.AddSingleton<IRemindersRepository, RemindersRepository>();
-			serviceCollection.AddSingleton<IUserPreferencesRepository, MockUserPreferencesRepository>();
 			serviceCollection.AddSingleton<IReminderHydrationService, ReminderHydrationService>();
 			serviceCollection.AddSingleton<IRemindersService, RemindersService>();
+			serviceCollection.AddSingleton<IUserPreferencesRepository, UserPreferencesRepository>();
+			serviceCollection.AddSingleton<IUserPreferencesService, UserPreferencesService>();
 		}
 	}
 }

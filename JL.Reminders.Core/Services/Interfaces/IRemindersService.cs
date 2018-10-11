@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-
 using JL.Reminders.Core.Model;
 
-namespace JL.Reminders.Core.Services
+namespace JL.Reminders.Core.Services.Interfaces
 {
 	public interface IRemindersService
 	{

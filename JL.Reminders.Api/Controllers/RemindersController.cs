@@ -1,13 +1,15 @@
 ﻿using System;
-using System.Security.Claims;
 using System.Threading.Tasks;
-using AutoMapper;
-using JL.Reminders.Api.Models;
-using JL.Reminders.Core.Model;
-using JL.Reminders.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+
+using AutoMapper;
+
+using JL.Reminders.Api.Common;
+using JL.Reminders.Api.Models;
+using JL.Reminders.Core.Model;
+using JL.Reminders.Core.Services.Interfaces;
 
 namespace JL.Reminders.Api.Controllers
 {
@@ -16,7 +18,7 @@ namespace JL.Reminders.Api.Controllers
 	[Produces("application/json")]
     [Route("api/[controller]")]
 	[EnableCors("RemindersUI")]
-    public class RemindersController : Controller
+    public class RemindersController : RemindersApiControllerBase
     {
 	    private readonly IRemindersService remindersService;
 
@@ -24,8 +26,6 @@ namespace JL.Reminders.Api.Controllers
 	    {
 		    this.remindersService = remindersService;
 	    }
-
-	    private string CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier);
 
 		/// <summary>
 		/// Fetch all reminders for the current user.
