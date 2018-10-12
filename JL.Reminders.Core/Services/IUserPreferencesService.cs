@@ -1,7 +1,8 @@
 ﻿using System.Threading.Tasks;
+
 using JL.Reminders.Core.Model;
 
-namespace JL.Reminders.Core.Services.Interfaces
+namespace JL.Reminders.Core.Services
 {
 	public interface IUserPreferencesService
 	{

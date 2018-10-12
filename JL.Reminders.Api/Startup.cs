@@ -10,9 +10,10 @@ using Microsoft.IdentityModel.Tokens;
 using AutoMapper;
 using Swashbuckle.AspNetCore.Swagger;
 using FluentValidation.AspNetCore;
-
+using JL.Reminders.Api.Automapper;
 using JL.Reminders.Api.Models;
 using JL.Reminders.Core.Model;
+using JL.Reminders.Services.Automapper;
 
 namespace JL.Reminders.Api
 {
@@ -103,11 +104,9 @@ namespace JL.Reminders.Api
 	    {
 		    Mapper.Initialize(config =>
 		    {
-			    config.CreateMap<PostNewReminderModel, Reminder>();
-
-			    config.CreateMap<PostNewActionModel, ReminderAction>()
-				    .ForMember(m => m.ReminderId, opt => opt.MapFrom(vm => vm.ReminderId))
-				    .ForMember(m => m.Notes, opt => opt.MapFrom(vm => vm.Notes));
+			    config.AddProfiles(
+				    typeof(ApiAutomapperProfile),
+				    typeof(ServicesAutomapperProfile));
 		    });
 		}
     }

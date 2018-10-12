@@ -1,8 +1,8 @@
 ﻿using System;
 
-using JL.Reminders.Core.Services.Interfaces;
+using JL.Reminders.Core.Services;
 
-namespace JL.Reminders.Core.Services
+namespace JL.Reminders.Services
 {
 	public class DateTimeService : IDateTimeService
 	{

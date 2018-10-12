@@ -4,9 +4,9 @@ using AutoMapper;
 
 using JL.Reminders.Core.Entities;
 using JL.Reminders.Core.Model;
-using JL.Reminders.Core.Services.Interfaces;
+using JL.Reminders.Core.Services;
 
-namespace JL.Reminders.Core.Services
+namespace JL.Reminders.Services
 {
 	/// <summary>
 	/// Given a Reminder and the user's preferences, calculate all fields

@@ -2,7 +2,7 @@
 
 using JL.Reminders.Core.Repositories;
 using JL.Reminders.Core.Services;
-using JL.Reminders.Core.Services.Interfaces;
+using JL.Reminders.Services;
 using JL.Reminders.Data;
 
 namespace JL.Reminders.Api

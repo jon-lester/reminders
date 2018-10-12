@@ -9,7 +9,7 @@ using AutoMapper;
 using JL.Reminders.Api.Common;
 using JL.Reminders.Api.Models;
 using JL.Reminders.Core.Model;
-using JL.Reminders.Core.Services.Interfaces;
+using JL.Reminders.Core.Services;
 
 namespace JL.Reminders.Api.Controllers
 {

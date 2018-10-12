@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 
 using Moq;
 using Xunit;
@@ -7,16 +6,17 @@ using Xunit;
 using JL.Reminders.Core.Entities;
 using JL.Reminders.Core.Model;
 using JL.Reminders.Core.Services;
-using JL.Reminders.Core.Services.Interfaces;
+using JL.Reminders.Services;
 
-namespace JL.Reminders.Core.Tests
+namespace JL.Reminders.Tests.Services
 {
-	public class ReminderCalculationServiceTests
+	public class ReminderHydrationServiceTests : ServiceTestsBase
 	{
 		private ReminderHydrationService GetUut(DateTime fakeNow)
 		{
 			Mock<IDateTimeService> dateTimeServiceMock = new Mock<IDateTimeService>();
 			dateTimeServiceMock.Setup(m => m.GetCurrentDateTime()).Returns(fakeNow);
+			dateTimeServiceMock.Setup(m => m.GetCurrentDate()).Returns(fakeNow.Date);
 
 			return new ReminderHydrationService(dateTimeServiceMock.Object);
 		}
@@ -147,6 +147,81 @@ namespace JL.Reminders.Core.Tests
 			});
 
 			Assert.Equal(new DateTime(expectedNextDueYear, expectedNextDueMonth, expectedNextDueDay), hydrated.NextDueDate);
+		}
+
+		[Theory]
+		[InlineData(2018, 10, 2, 00, 00, 2018, 10, 2, 00, 00)]
+		[InlineData(2018, 10, 2, 23, 59, 2018, 10, 2, 00, 00)]
+		[InlineData(2018, 10, 2, 00, 00, 2018, 10, 2, 23, 59)]
+		[InlineData(2018, 10, 2, 23, 59, 2018, 10, 2, 23, 59)]
+		public void Days_To_Go_Is_Zero_When_Next_Due_Is_Today_Regardless_Of_Time_Of_Day(
+			int todayYear, int todayMonth, int todayDay, int todayHour, int todayMin,
+			int forYear, int forMonth, int forDay, int forHour, int forMin)
+		{
+			DateTime forDate = new DateTime(forYear, forMonth, forDay, forHour, forMin, 0);
+			DateTime today = new DateTime(todayYear, todayMonth, todayDay, todayHour, todayMin, 0);
+
+			foreach (Recurrence recurrence in Enum.GetValues(typeof(Recurrence)))
+			{
+				var hydrated = GetUut(today).HydrateReminder(new ReminderEntity
+				{
+					Recurrence = recurrence,
+					ForDate = forDate,
+					LastActioned = null
+				});
+
+				Assert.Equal(0, hydrated.DaysToGo);
+			}
+		}
+
+		[Theory]
+		[InlineData(2018, 10, 2, 00, 00, 2018, 10, 3, 00, 00)]
+		[InlineData(2018, 10, 2, 23, 59, 2018, 10, 3, 00, 00)]
+		[InlineData(2018, 10, 2, 00, 00, 2018, 10, 3, 23, 59)]
+		[InlineData(2018, 10, 2, 23, 59, 2018, 10, 3, 23, 59)]
+		public void Days_To_Go_Is_One_When_Next_Due_Is_Tomorrow_Regardless_Of_Time_Of_Day(
+			int todayYear, int todayMonth, int todayDay, int todayHour, int todayMin,
+			int forYear, int forMonth, int forDay, int forHour, int forMin)
+		{
+			DateTime forDate = new DateTime(forYear, forMonth, forDay, forHour, forMin, 0);
+			DateTime today = new DateTime(todayYear, todayMonth, todayDay, todayHour, todayMin, 0);
+
+			foreach (Recurrence recurrence in Enum.GetValues(typeof(Recurrence)))
+			{
+				var hydrated = GetUut(today).HydrateReminder(new ReminderEntity
+				{
+					Recurrence = recurrence,
+					ForDate = forDate,
+					LastActioned = null
+				});
+
+				Assert.Equal(1, hydrated.DaysToGo);
+			}
+		}
+
+		[Theory]
+		[InlineData(2018, 10, 2, 00, 00, 2018, 10, 1, 00, 00)]
+		[InlineData(2018, 10, 2, 23, 59, 2018, 10, 1, 00, 00)]
+		[InlineData(2018, 10, 2, 00, 00, 2018, 10, 1, 23, 59)]
+		[InlineData(2018, 10, 2, 23, 59, 2018, 10, 1, 23, 59)]
+		public void Days_To_Go_Is_Minus_One_When_Next_Due_Is_Yesterday_Regardless_Of_Time_Of_Day(
+			int todayYear, int todayMonth, int todayDay, int todayHour, int todayMin,
+			int forYear, int forMonth, int forDay, int forHour, int forMin)
+		{
+			DateTime forDate = new DateTime(forYear, forMonth, forDay, forHour, forMin, 0);
+			DateTime today = new DateTime(todayYear, todayMonth, todayDay, todayHour, todayMin, 0);
+
+			foreach (Recurrence recurrence in Enum.GetValues(typeof(Recurrence)))
+			{
+				var hydrated = GetUut(today).HydrateReminder(new ReminderEntity
+				{
+					Recurrence = recurrence,
+					ForDate = forDate,
+					LastActioned = null
+				});
+
+				Assert.Equal(-1, hydrated.DaysToGo);
+			}
 		}
 	}
 }

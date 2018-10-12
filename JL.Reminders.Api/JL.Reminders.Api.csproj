@@ -20,14 +20,11 @@
 	<PackageReference Include="FluentValidation.AspNetCore" Version="8.0.100" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0" />
   </ItemGroup>
-  
-  <ItemGroup>
-
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\JL.Reminders.Core\JL.Reminders.Core.csproj" />
     <ProjectReference Include="..\JL.Reminders.Data\JL.Reminders.Data.csproj" />
+    <ProjectReference Include="..\JL.Reminders.Services\JL.Reminders.Services.csproj" />
   </ItemGroup>
 
 </Project>

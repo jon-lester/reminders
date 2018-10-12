@@ -11,9 +11,9 @@ using AutoMapper;
 using JL.Reminders.Core.Entities;
 using JL.Reminders.Core.Model;
 using JL.Reminders.Core.Repositories;
-using JL.Reminders.Core.Services.Interfaces;
+using JL.Reminders.Core.Services;
 
-namespace JL.Reminders.Core.Services
+namespace JL.Reminders.Services
 {
 	public class RemindersService : IRemindersService
 	{
@@ -55,8 +55,7 @@ namespace JL.Reminders.Core.Services
 
 		public async Task<long> AddReminderAsync(string userId, Reminder reminder)
 		{
-			return await this.remindersRepository.AddReminderAsync(userId,
-				Mapper.Map<Reminder, ReminderEntity>(reminder, opts => opts.ConfigureMap(MemberList.Destination)));
+			return await this.remindersRepository.AddReminderAsync(userId, Mapper.Map<ReminderEntity>(reminder));
 		}
 
 		public async Task<bool> DeleteReminderAsync(string userId, long reminderId)
@@ -66,8 +65,7 @@ namespace JL.Reminders.Core.Services
 
 		public async Task<bool> UpdateReminderAsync(string userId, Reminder reminder)
 		{
-			return await this.remindersRepository.UpdateReminderAsync(userId,
-				Mapper.Map<Reminder, ReminderEntity>(reminder, opts => opts.ConfigureMap(MemberList.Destination)));
+			return await this.remindersRepository.UpdateReminderAsync(userId, Mapper.Map<ReminderEntity>(reminder));
 		}
 
 		public async Task<bool> ActionReminderAsync(string userId, ReminderAction action)

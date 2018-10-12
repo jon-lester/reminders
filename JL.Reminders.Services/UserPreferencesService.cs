@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using JL.Reminders.Core.Entities;
 using JL.Reminders.Core.Model;
 using JL.Reminders.Core.Repositories;
-using JL.Reminders.Core.Services.Interfaces;
+using JL.Reminders.Core.Services;
 
-namespace JL.Reminders.Core.Services
+namespace JL.Reminders.Services
 {
 	public class UserPreferencesService : IUserPreferencesService
 	{

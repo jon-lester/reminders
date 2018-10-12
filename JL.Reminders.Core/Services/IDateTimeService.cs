@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace JL.Reminders.Core.Services.Interfaces
+namespace JL.Reminders.Core.Services
 {
 	public interface IDateTimeService
 	{

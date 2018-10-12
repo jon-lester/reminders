@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using JL.Reminders.Api.Common;
 using JL.Reminders.Api.Models;
 using JL.Reminders.Core.Model;
-using JL.Reminders.Core.Services.Interfaces;
+using JL.Reminders.Core.Services;
 
 namespace JL.Reminders.Api.Controllers
 {
@@ -33,18 +33,26 @@ namespace JL.Reminders.Api.Controllers
 			return Ok(preferences);
 		}
 
-		public async Task<IActionResult> SetUserPreferences([FromBody] PatchUserPreferencesModel userPreferences)
+		[HttpPatch]
+		public async Task<IActionResult> PatchUserPreferences([FromBody] PatchUserPreferencesModel userPreferences)
 		{
-			await this.userPreferencesService.SetUserPreferencesAsync(CurrentUserId, new UserPreferences
+			if (ModelState.IsValid)
 			{
-				UrgencyConfiguration = new UrgencyConfiguration
+				await this.userPreferencesService.SetUserPreferencesAsync(CurrentUserId, new UserPreferences
 				{
-					ImminentDays = userPreferences.ImminentDays,
-					SoonDays = userPreferences.SoonDays
-				}
-			});
+					UrgencyConfiguration = new UrgencyConfiguration
+					{
+						ImminentDays = userPreferences.ImminentDays,
+						SoonDays = userPreferences.SoonDays
+					}
+				});
 
-			return Ok();
+				return Ok();
+			}
+			else
+			{
+				return BadRequest(ModelState);
+			}
 		}
     }
 }
