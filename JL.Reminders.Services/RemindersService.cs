@@ -18,24 +18,24 @@ namespace JL.Reminders.Services
 	public class RemindersService : IRemindersService
 	{
 		private readonly IRemindersRepository remindersRepository;
-		private readonly IReminderHydrationService reminderHydrationService;
+		private readonly IRemindersUtilityService reminderUtilityService;
 
 		public RemindersService(
 			IRemindersRepository remindersRepository,
-			IReminderHydrationService reminderHydrationService)
+			IRemindersUtilityService reminderUtilityService)
 		{
 			this.remindersRepository = remindersRepository;
-			this.reminderHydrationService = reminderHydrationService;
+			this.reminderUtilityService = reminderUtilityService;
 		}
 
 		public async Task<IEnumerable<Reminder>> GetRemindersByUserIdAsync(string userId, ReminderStatus status)
 		{
 			var reminders = (await this.remindersRepository.GetRemindersByUserIdAsync(userId, status)).ToList();
 
-			return reminders.Select(r => reminderHydrationService.HydrateReminder(r)).ToList();
+			return reminders.Select(MapReminder).ToList();
 		}
 
-		public Task<ReminderOptions> GetReminderOptions()
+		public Task<ReminderOptions> GetReminderOptionsAsync()
 		{
 			ReminderOptions options = new ReminderOptions
 			{
@@ -50,7 +50,7 @@ namespace JL.Reminders.Services
 		{
 			var reminder = await this.remindersRepository.GetReminderByIdAsync(userId, reminderId);
 
-			return reminderHydrationService?.HydrateReminder(reminder);
+			return MapReminder(reminder);
 		}
 
 		public async Task<long> AddReminderAsync(string userId, Reminder reminder)
@@ -93,6 +93,36 @@ namespace JL.Reminders.Services
 		public async Task<bool> SetReminderStatusAsync(string userId, long reminderId, ReminderStatus status)
 		{
 			return await this.remindersRepository.SetReminderStatusAsync(userId, reminderId, status);
+		}
+
+		/// <summary>
+		/// Convert a <see cref="ReminderEntity"/> to a <see cref="Reminder"/>,
+		/// filling in all calculated properties that aren't directly provided
+		/// by the entity object. Return null if the argument was null.
+		/// </summary>
+		/// <param name="reminderEntity">A populated <see cref="ReminderEntity"/> object.</param>
+		/// <returns>A populated <see cref="Reminder"/> object.</returns>
+		private Reminder MapReminder(ReminderEntity reminderEntity)
+		{
+			if (reminderEntity == null)
+			{
+				return null;
+			}
+
+			Reminder hydratedReminder = Mapper.Map<Reminder>(reminderEntity);
+
+			hydratedReminder.NextDueDate = reminderUtilityService.CalculateNextDueDate(
+				hydratedReminder.Recurrence,
+				hydratedReminder.ForDate,
+				hydratedReminder.LastActioned);
+
+			hydratedReminder.DaysToGo = reminderUtilityService.CalculateDaysToGo(hydratedReminder.NextDueDate);
+
+			hydratedReminder.SubTitle = reminderUtilityService.FormatReminderSubtitle(
+					hydratedReminder.Recurrence,
+					hydratedReminder.ForDate);
+
+			return hydratedReminder;
 		}
 
 		/// <summary>

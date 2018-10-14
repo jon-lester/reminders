@@ -14,7 +14,7 @@ namespace JL.Reminders.Api
 			serviceCollection.AddSingleton<IDateTimeService, DateTimeService>();
 			serviceCollection.AddSingleton<IConnectionStringFactory, ConnectionStringFactory>();
 			serviceCollection.AddSingleton<IRemindersRepository, RemindersRepository>();
-			serviceCollection.AddSingleton<IReminderHydrationService, ReminderHydrationService>();
+			serviceCollection.AddSingleton<IRemindersUtilityService, RemindersUtilityService>();
 			serviceCollection.AddSingleton<IRemindersService, RemindersService>();
 			serviceCollection.AddSingleton<IUserPreferencesRepository, UserPreferencesRepository>();
 			serviceCollection.AddSingleton<IUserPreferencesService, UserPreferencesService>();

@@ -13,8 +13,20 @@ using JL.Reminders.Services;
 
 namespace JL.Reminders.Tests.Services
 {
-	public class RemindersServiceTests
+	public class RemindersServiceTests : ServiceTestsBase
 	{
+		private Mock<IRemindersRepository> repositoryMock;
+		private Mock<IRemindersUtilityService> utilityServiceMock;
+
+		private RemindersService uut;
+		
+		public RemindersServiceTests()
+		{
+			this.repositoryMock = new Mock<IRemindersRepository>();
+			this.utilityServiceMock = new Mock<IRemindersUtilityService>();
+			this.uut = new RemindersService(this.repositoryMock.Object, this.utilityServiceMock.Object);
+		}
+
 		private ReminderEntity GetMockReminderEntity(long id)
 		{
 			return new ReminderEntity
@@ -33,94 +45,118 @@ namespace JL.Reminders.Tests.Services
 			};
 		}
 
-		private Reminder GetMockReminder(long id)
+		[Fact]
+		public async Task GetReminderByIdAsync_Passes_User_ID_And_Reminder_ID_To_Repository()
 		{
-			return new Reminder
-			{
-				Created = new DateTime(2018, 1, 1, 1, 1, 1),
-				Recurrence = Recurrence.Monthly,
-				ForDate = new DateTime(2018, 2, 2, 2, 2, 2),
-				LastActioned = new DateTime(2018, 3, 3, 3, 3, 3),
-				Description = "Some description",
-				Importance = Importance.Important,
-				Title = "Some title",
-				Status = ReminderStatus.Active,
-				SoonDaysPreference = 321,
-				ImminentDaysPreference = 123,
-				Id = id,
-				DaysToGo = 444,
-				NextDueDate = new DateTime(2018, 4, 4, 4, 4, 4),
-				SubTitle = "Some subtitle"
-			};
-		}
+			await uut.GetReminderByIdAsync("user|1234", 123);
 
-		private void AssertEqualEntityAndObject(ReminderEntity theReminderEntity, Reminder theReminderObject)
-		{
-			Assert.Equal(theReminderEntity.Created, theReminderObject.Created);
-			Assert.Equal(theReminderEntity.Recurrence, theReminderObject.Recurrence);
-			Assert.Equal(theReminderEntity.ForDate, theReminderObject.ForDate);
-			Assert.Equal(theReminderEntity.LastActioned, theReminderObject.LastActioned);
-			Assert.Equal(theReminderEntity.Description, theReminderObject.Description);
-			Assert.Equal(theReminderEntity.Importance, theReminderObject.Importance);
-			Assert.Equal(theReminderEntity.Title, theReminderObject.Title);
-			Assert.Equal(theReminderEntity.Status, theReminderObject.Status);
-			Assert.Equal(theReminderEntity.SoonDaysPreference, theReminderObject.SoonDaysPreference);
-			Assert.Equal(theReminderEntity.ImminentDaysPreference, theReminderObject.ImminentDaysPreference);
-			Assert.Equal(theReminderEntity.Id, theReminderObject.Id);
+			repositoryMock.Verify(m => m.GetReminderByIdAsync("user|1234", 123), Times.Once);
 		}
 
 		[Fact]
-		public async Task GetRemindersByUserIdAsync_Passes_User_ID_And_Reminder_ID_To_Repository()
-		{
-			Mock<IRemindersRepository> repoMock = new Mock<IRemindersRepository>();
-			Mock<IReminderHydrationService> hydrationServiceMock = new Mock<IReminderHydrationService>();
-
-			RemindersService service = new RemindersService(repoMock.Object, hydrationServiceMock.Object);
-
-			await service.GetReminderByIdAsync("user|1234", 123);
-
-			repoMock.Verify(m => m.GetReminderByIdAsync("user|1234", 123), Times.Once);
-		}
-
-		[Fact]
-		public async Task GetRemindersByUserIdAsync_Passes_The_Reminder_From_The_Repository_To_The_Hydration_Service()
+		public async Task GetReminderByIdAsync_Maps_The_Reminder_Entity_To_A_Reminder_Object()
 		{
 			var mockReminderEntity = GetMockReminderEntity(999);
 
-			Mock<IRemindersRepository> repoMock = new Mock<IRemindersRepository>();
-			repoMock.Setup(m => m.GetReminderByIdAsync(It.IsAny<string>(), It.IsAny<long>()))
+			repositoryMock
+				.Setup(m => m.GetReminderByIdAsync(It.IsAny<string>(), It.IsAny<long>()))
 				.ReturnsAsync(mockReminderEntity);
 
-			ReminderEntity reminderReceivedByHydrationService = null;
-			Mock<IReminderHydrationService> hydrationServiceMock = new Mock<IReminderHydrationService>();
-			hydrationServiceMock.Setup(m => m.HydrateReminder(It.IsAny<ReminderEntity>()))
-				.Callback((ReminderEntity reminder) => reminderReceivedByHydrationService = reminder);
+			var reminder = await uut.GetReminderByIdAsync("1", 1);
 
-			RemindersService service = new RemindersService(repoMock.Object, hydrationServiceMock.Object);
-
-			await service.GetReminderByIdAsync("1", 1);
-
-			Assert.Equal(mockReminderEntity, reminderReceivedByHydrationService);
+			Assert.Equal(mockReminderEntity.Created, reminder.Created);
+			Assert.Equal(mockReminderEntity.Recurrence, reminder.Recurrence);
+			Assert.Equal(mockReminderEntity.ForDate, reminder.ForDate);
+			Assert.Equal(mockReminderEntity.LastActioned, reminder.LastActioned);
+			Assert.Equal(mockReminderEntity.Description, reminder.Description);
+			Assert.Equal(mockReminderEntity.Importance, reminder.Importance);
+			Assert.Equal(mockReminderEntity.Title, reminder.Title);
+			Assert.Equal(mockReminderEntity.Status, reminder.Status);
+			Assert.Equal(mockReminderEntity.SoonDaysPreference, reminder.SoonDaysPreference);
+			Assert.Equal(mockReminderEntity.ImminentDaysPreference, reminder.ImminentDaysPreference);
+			Assert.Equal(mockReminderEntity.Id, reminder.Id);
 		}
 
 		[Fact]
-		public async Task GetRemindersByUserIdAsync_Returns_The_Reminder_Provided_By_The_Hydration_Service()
+		public async Task GetReminderByIdAsync_Calls_The_Utility_Service_To_Populate_The_DaysToGo_Property()
 		{
-			var mockReminder = GetMockReminder(999);
+			var mockReminderEntity = GetMockReminderEntity(999);
 
-			Mock<IRemindersRepository> repoMock = new Mock<IRemindersRepository>();
-			repoMock.Setup(m => m.GetReminderByIdAsync(It.IsAny<string>(), It.IsAny<long>()))
+			repositoryMock
+				.Setup(m => m.GetReminderByIdAsync(It.IsAny<string>(), It.IsAny<long>()))
+				.ReturnsAsync(mockReminderEntity);
+
+			utilityServiceMock
+				.Setup(m => m.CalculateDaysToGo(It.IsAny<DateTime>()))
+				.Returns(99)
+				.Verifiable();
+
+			var reminder = await uut.GetReminderByIdAsync("1", 1);
+
+			utilityServiceMock.Verify();
+			Assert.Equal(99, reminder.DaysToGo);
+		}
+
+		[Fact]
+		public async Task GetReminderByIdAsync_Calls_The_Utility_Service_To_Populate_The_NextDueDate_Property()
+		{
+			DateTime nextDueDate = new DateTime(2018, 12, 25);
+
+			repositoryMock
+				.Setup(m => m.GetReminderByIdAsync(It.IsAny<string>(), It.IsAny<long>()))
 				.ReturnsAsync(GetMockReminderEntity(999));
 
-			Mock<IReminderHydrationService> hydrationServiceMock = new Mock<IReminderHydrationService>();
-			hydrationServiceMock.Setup(m => m.HydrateReminder(It.IsAny<ReminderEntity>()))
-				.Returns(mockReminder);
+			utilityServiceMock
+				.Setup(m => m.CalculateNextDueDate(It.IsAny<Recurrence>(), It.IsAny<DateTime>(), It.IsAny<DateTime?>()))
+				.Returns(nextDueDate)
+				.Verifiable();
 
-			RemindersService service = new RemindersService(repoMock.Object, hydrationServiceMock.Object);
+			var reminder = await uut.GetReminderByIdAsync("1", 1);
 
-			var theReminderObject = await service.GetReminderByIdAsync("1", 1);
+			utilityServiceMock.Verify();
+			Assert.Equal(nextDueDate, reminder.NextDueDate);
+		}
 
-			Assert.Equal(mockReminder, theReminderObject);
+		[Fact]
+		public async Task GetReminderByIdAsync_Calls_The_Utility_Service_To_Populate_The_SubTitle_Property()
+		{
+			string subtitle = "This is the formatted subtitle";
+
+			repositoryMock
+				.Setup(m => m.GetReminderByIdAsync(It.IsAny<string>(), It.IsAny<long>()))
+				.ReturnsAsync(GetMockReminderEntity(999));
+
+			utilityServiceMock
+				.Setup(m => m.FormatReminderSubtitle(It.IsAny<Recurrence>(), It.IsAny<DateTime>()))
+				.Returns(subtitle)
+				.Verifiable();
+
+			var reminder = await uut.GetReminderByIdAsync("1", 1);
+
+			utilityServiceMock.Verify();
+			Assert.Equal(subtitle, reminder.SubTitle);
+		}
+
+		[Fact]
+		public async Task GetReminderOptions_Returns_All_Recurrence_Types()
+		{
+			var options = await uut.GetReminderOptionsAsync();
+
+			foreach (int r in Enum.GetValues(typeof(Recurrence)))
+			{
+				Assert.True(options.Recurrences.ContainsKey(r));
+			}
+		}
+
+		[Fact]
+		public async Task GetReminderOptions_Returns_All_Importance_Types()
+		{
+			var options = await uut.GetReminderOptionsAsync();
+
+			foreach (int r in Enum.GetValues(typeof(Importance)))
+			{
+				Assert.True(options.Importances.ContainsKey(r));
+			}
 		}
 	}
 }

@@ -47,7 +47,7 @@ namespace JL.Reminders.Api.Controllers
 	    [Route("options")]
 	    public async Task<IActionResult> GetOptions()
 	    {
-		    var reminderOptions = await remindersService.GetReminderOptions();
+		    var reminderOptions = await remindersService.GetReminderOptionsAsync();
 
 		    return Ok(reminderOptions);
 	    }
