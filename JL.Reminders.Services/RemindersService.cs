@@ -19,13 +19,16 @@ namespace JL.Reminders.Services
 	{
 		private readonly IRemindersRepository remindersRepository;
 		private readonly IRemindersUtilityService reminderUtilityService;
+		private readonly IDateTimeService dateTimeService;
 
 		public RemindersService(
 			IRemindersRepository remindersRepository,
-			IRemindersUtilityService reminderUtilityService)
+			IRemindersUtilityService reminderUtilityService,
+			IDateTimeService dateTimeService)
 		{
 			this.remindersRepository = remindersRepository;
 			this.reminderUtilityService = reminderUtilityService;
+			this.dateTimeService = dateTimeService;
 		}
 
 		public async Task<IEnumerable<Reminder>> GetRemindersByUserIdAsync(string userId, ReminderStatus status)
@@ -72,7 +75,8 @@ namespace JL.Reminders.Services
 		{
 			// TODO: temp code pending db re-schema to store the action timestamp and notes
 
-			action.ActionedAt = DateTime.UtcNow;
+			action.ActionedAt = dateTimeService.GetCurrentDateTime();
+
 			if (String.IsNullOrWhiteSpace(action.Notes))
 			{
 				action.Notes = null;
