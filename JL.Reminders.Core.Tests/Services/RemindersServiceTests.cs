@@ -18,6 +18,7 @@ namespace JL.Reminders.Tests.Services
 	{
 		private Mock<IRemindersRepository> repositoryMock;
 		private Mock<IRemindersUtilityService> utilityServiceMock;
+		private Mock<IDateTimeService> dateTimeServiceMock;
 
 		private RemindersService uut;
 		
@@ -25,7 +26,11 @@ namespace JL.Reminders.Tests.Services
 		{
 			this.repositoryMock = new Mock<IRemindersRepository>();
 			this.utilityServiceMock = new Mock<IRemindersUtilityService>();
-			this.uut = new RemindersService(this.repositoryMock.Object, this.utilityServiceMock.Object);
+			this.dateTimeServiceMock = new Mock<IDateTimeService>();
+			this.uut = new RemindersService(
+				this.repositoryMock.Object,
+				this.utilityServiceMock.Object,
+				this.dateTimeServiceMock.Object);
 		}
 
 		[Fact]
