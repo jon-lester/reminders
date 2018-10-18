@@ -15,3 +15,5 @@ CREATE TABLE IF NOT EXISTS reminders.reminders (
   PRIMARY KEY (ID),
   KEY idxUserId (UserID)
 ) ENGINE=InnoDB;
+
+GRANT SELECT, INSERT, UPDATE ON reminders.reminders TO `reminders`@`localhost`;

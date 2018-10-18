@@ -17,3 +17,5 @@ CREATE TABLE IF NOT EXISTS preferences (
 	PRIMARY KEY		(ID),
 	UNIQUE INDEX	idxUserID (UserID)
 );
+
+GRANT SELECT, INSERT, UPDATE ON reminders.preferences TO 'reminders'@'localhost';
