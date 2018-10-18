@@ -1,0 +1,45 @@
+##############
+# UPDATE API #
+##############
+
+# stop the service
+systemctl stop reminders-api
+
+# remove existing install
+cd /opt/reminders/
+rm *
+
+# extract new install
+tar -xzf ~/release-0.6.0/reminders-api.tar.gz
+
+# set up permissions
+chown reminders:centos *
+chmod 664 *
+
+# restart the service
+systemctl start reminders-api
+
+#############
+# UPDATE DB #
+#############
+
+mysql -uroot -p
+# SOURCE ~/release-0.6.0/0.6.0-patch-database.sql;
+
+#############
+# UPDATE UI #
+#############
+
+# remove existing install
+cd /var/www/reminders.jonlester.me/
+rm -rf *
+
+# extract new install
+tar -xzf ~/release-0.6.0/reminders-ui.tar.gz
+
+# set up permissions
+chown -R centos:centos *
+chmod -R 644 *
+chmod 755 static
+chmod 755 static/css
+chmod 755 static/js
