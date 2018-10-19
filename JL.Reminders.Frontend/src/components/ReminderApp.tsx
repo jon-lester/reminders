@@ -4,11 +4,11 @@ import * as React from 'react';
 
 import { withApi, WithApiServiceProps } from '../services/ApiService';
 
-import AddReminderModal from './AddReminderModal';
+import ReminderCardView from './cardview/ReminderCardView';
 import ErrorView from './ErrorView';
 import LoadingView from './LoadingView';
-import ReminderCardView from './ReminderCardView';
-import SettingsModal from './SettingsModal';
+import AddReminderModal from './modals/AddReminderModal';
+import SettingsModal from './modals/SettingsModal';
 import ViewWrapper from './ViewWrapper';
 
 import AppState from '../model/AppState';

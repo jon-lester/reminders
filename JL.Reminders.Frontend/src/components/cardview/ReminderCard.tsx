@@ -9,10 +9,10 @@ import yellow from '@material-ui/core/colors/yellow';
 import { createStyles, withStyles } from '@material-ui/core/styles';
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 
-import IMenuItem from '../model/IMenuItem';
-import IReminder from '../model/IReminder';
-import Urgency from '../model/Urgency';
-import ReminderAppMenu from './ReminderAppMenu';
+import IMenuItem from '../../model/IMenuItem';
+import IReminder from '../../model/IReminder';
+import Urgency from '../../model/Urgency';
+import ReminderAppMenu from '../ReminderAppMenu';
 import ReminderCardDays from './ReminderCardDays';
 
 const styles = () => {

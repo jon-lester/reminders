@@ -2,8 +2,8 @@ import * as Mui from '@material-ui/core';
 import * as moment from 'moment';
 import * as React from 'react';
 
-import IAddReminderRequest from '../model/IAddReminderRequest';
-import IOptions from '../model/Options';
+import IAddReminderRequest from '../../model/IAddReminderRequest';
+import IOptions from '../../model/Options';
 
 interface IAddReminderDialogComponentProps {
     open: boolean;

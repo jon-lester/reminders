@@ -3,10 +3,10 @@ import { createStyles, withStyles } from '@material-ui/core/styles';
 import AddIcon from '@material-ui/icons/Add';
 import * as React from 'react';
 
+import ReminderFAB from '../ReminderFAB';
 import ReminderCard from './ReminderCard';
-import ReminderFAB from './ReminderFAB';
 
-import IReminder from '../model/IReminder';
+import IReminder from '../../model/IReminder';
 
 const styles = (theme: Mui.Theme) => createStyles({
     addIcon: {
@@ -60,7 +60,7 @@ class ReminderCardView extends React.Component<IReminderCardViewProps> {
                     <Mui.Grid container={true} spacing={24}>{cards}</Mui.Grid>
                 ) : (<>
                     <Mui.Typography align="center" variant="display1">You have no reminders!</Mui.Typography>,
-                    <Mui.Typography align="center" variant="display1">Click <AddIcon className={this.props.classes.addIcon} /> below to get started.</Mui.Typography>
+                    <Mui.Typography align="center" variant="display1">Click the <AddIcon className={this.props.classes.addIcon} /> button to get started.</Mui.Typography>
                     </>
                 )}
                 <ReminderFAB

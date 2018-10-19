@@ -7,7 +7,7 @@ import * as Mui from '@material-ui/core';
 import { createStyles, withStyles } from '@material-ui/core/styles';
 import * as React from 'react';
 
-import Urgency from '../model/Urgency';
+import Urgency from '../../model/Urgency';
 
 const styles = () => createStyles({
     time: {

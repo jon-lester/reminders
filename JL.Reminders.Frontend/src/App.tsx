@@ -4,9 +4,9 @@ import { Route, Switch } from 'react-router-dom';
 
 import { withAuthService, WithAuthServiceProps } from './services/AuthService';
 
-import AboutModal from './components/AboutModal';
 import AuthCallbackComponent from './components/AuthCallbackComponent';
 import HomeView from './components/HomeView';
+import AboutModal from './components/modals/AboutModal';
 import ReminderApp from './components/ReminderApp';
 import ReminderAppMenuBar from './components/ReminderAppMenuBar';
 
