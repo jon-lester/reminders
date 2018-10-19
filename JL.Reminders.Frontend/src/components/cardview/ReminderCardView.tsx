@@ -59,7 +59,7 @@ class ReminderCardView extends React.Component<IReminderCardViewProps> {
                 {this.props.reminders.length ? (
                     <Mui.Grid container={true} spacing={24}>{cards}</Mui.Grid>
                 ) : (<>
-                    <Mui.Typography align="center" variant="display1">You have no reminders!</Mui.Typography>,
+                    <Mui.Typography align="center" variant="display1">You have no reminders!</Mui.Typography>
                     <Mui.Typography align="center" variant="display1">Click the <AddIcon className={this.props.classes.addIcon} /> button to get started.</Mui.Typography>
                     </>
                 )}
