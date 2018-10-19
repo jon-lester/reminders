@@ -1,6 +1,8 @@
 CREATE DATABASE IF NOT EXISTS reminders;
 
-DROP TABLE reminders.reminders;
+USE reminders;
+
+DROP TABLE IF EXISTS reminders;
 
 CREATE TABLE IF NOT EXISTS reminders.reminders (
   ID int(10) unsigned NOT NULL AUTO_INCREMENT,
