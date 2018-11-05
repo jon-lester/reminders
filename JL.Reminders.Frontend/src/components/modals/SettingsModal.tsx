@@ -93,14 +93,14 @@ class SettingsModal extends React.Component<ISettingsModalProps & Mui.WithStyles
         let imminentDaysValid = this.isValidDayRange(this.state.urgencyConfiguration.imminentDays);
         let soonDaysValid = this.isValidDayRange(this.state.urgencyConfiguration.soonDays);
 
-        let imminentDaysErrorMessage = imminentDaysValid ? null : '1-365';
-        let soonDaysErrorMessage = soonDaysValid ? null : '1-365';
+        let imminentDaysErrorMessage = imminentDaysValid ? null : 'Must be a value from 1 to 365.';
+        let soonDaysErrorMessage = soonDaysValid ? null : 'Must be a value from 1 to 365.';
 
-        if (this.state.urgencyConfiguration.imminentDays > this.state.urgencyConfiguration.soonDays) {
+        if (this.state.urgencyConfiguration.imminentDays >= this.state.urgencyConfiguration.soonDays) {
             imminentDaysValid = false;
             soonDaysValid = false;
-            imminentDaysErrorMessage = 'Must be lower than soon.'
-            soonDaysErrorMessage = 'Must be higher than imminent.'
+            imminentDaysErrorMessage = 'Must be lower than the value for soon.'
+            soonDaysErrorMessage = 'Must be higher than the value for imminent.'
         }
 
         this.setState((state) => ({

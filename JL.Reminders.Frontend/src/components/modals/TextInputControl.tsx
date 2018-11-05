@@ -12,6 +12,7 @@ interface ITextInputControlProps {
     errorMessage: string | null;
     id: string;
     label: string;
+    maxLength?: number;
     onChange: (value: string, id: string) => void;
     valid: boolean;
 }
@@ -35,8 +36,7 @@ class TextInputControl extends React.Component<ITextInputControlProps & Mui.With
                 fullWidth={true}
                 aria-describedby={`${this.props.id}-helper-text`}>
                 <Mui.InputLabel
-                    htmlFor={this.props.id}
-                    error={!this.props.valid}>
+                    htmlFor={this.props.id}>
                     {this.props.label}
                 </Mui.InputLabel>
                 <Mui.Input
@@ -48,10 +48,11 @@ class TextInputControl extends React.Component<ITextInputControlProps & Mui.With
                     error={!this.props.valid}
                     defaultValue={this.props.defaultValue}
                     endAdornment={this.props.endAdornment}
+                    inputProps={this.props.maxLength ? {maxLength: this.props.maxLength} : {}}
                 />
                 {!this.props.valid &&
                     <Mui.FormHelperText
-                        id={`${this.props.id}-helper-text`}
+                        id={this.props.id + "-helper-text"}
                         className={this.props.classes.formHelperErrorText}>
                         {this.props.errorMessage || 'Error'}
                     </Mui.FormHelperText>}

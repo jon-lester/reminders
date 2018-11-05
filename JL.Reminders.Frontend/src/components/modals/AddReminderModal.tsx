@@ -4,8 +4,9 @@ import * as React from 'react';
 
 import IAddReminderRequest from '../../model/IAddReminderRequest';
 import IOptions from '../../model/Options';
+import TextInputControl from './TextInputControl';
 
-interface IAddReminderDialogComponentProps {
+interface IAddReminderDialogProps {
     open: boolean;
     occurrenceOptions: IOptions;
     importanceOptions: IOptions;
@@ -13,17 +14,33 @@ interface IAddReminderDialogComponentProps {
     onSave(addReminderRequest: IAddReminderRequest): void;
 }
 
-class AddReminderModal extends React.Component<IAddReminderDialogComponentProps, IAddReminderRequest> {
+interface IAddReminderDialogState {
+    addReminderRequest: IAddReminderRequest;
+    forDateErrorMessage: string | null;
+    forDateValid: boolean;
+    formValid: boolean;
+    titleErrorMessage: string | null;
+    titleValid: boolean;
+}
+
+class AddReminderModal extends React.Component<IAddReminderDialogProps, IAddReminderDialogState> {
 
     constructor(props: any) {
         super(props);
 
         this.state = {
-            description: '',
-            forDate: moment().format(),
-            importance: 0,
-            recurrence: 0,
-            title: ''
+            addReminderRequest: {
+                description: '',
+                forDate: moment().format(),
+                importance: 0,
+                recurrence: 0,
+                title: ''
+            },
+            forDateErrorMessage: null,
+            forDateValid: true,
+            formValid: false,
+            titleErrorMessage: null,
+            titleValid: true,
         };
     }
 
@@ -49,37 +66,41 @@ class AddReminderModal extends React.Component<IAddReminderDialogComponentProps,
                 disableEscapeKeyDown={true}
                 open={this.props.open}
                 onClose={this.props.onClose}>
-                <Mui.DialogTitle>Add Reminder</Mui.DialogTitle>
+                <Mui.DialogTitle>Add a new reminder</Mui.DialogTitle>
                 <Mui.DialogContent>
-                    <Mui.DialogContentText>Add a new reminder to the dashboard.</Mui.DialogContentText>
-                </Mui.DialogContent>
-                <Mui.DialogContent>
-                    <Mui.TextField
-                        id="reminder-title"
+                    <TextInputControl
+                        id="title"
                         onChange={this.handleTitleChange}
+                        autoFocus={true}
+                        defaultValue={''}
+                        errorMessage={this.state.titleErrorMessage}
                         label="Title"
-                        fullWidth={true}
-                        autoFocus={true}/>
+                        valid={this.state.titleValid}
+                        maxLength={64}
+                    />
                     <Mui.TextField
                         id="reminder-description"
                         onChange={this.handleDescriptionChange}
                         label="Description"
-                        fullWidth={true}/>
+                        fullWidth={true}
+                        margin="normal"
+                    />
                     <Mui.TextField
                         id="reminder-fordate"
-                        style={{marginTop: 20}}
                         onChange={this.handleDateChange}
                         defaultValue={moment().format('YYYY-MM-DD')}
                         label="For Date"
                         fullWidth={true}
                         InputLabelProps={{shrink: true}}
-                        type="date"/>
-                    <Mui.FormControl style={{minWidth: 120}}>
+                        type="date"
+                        margin="normal"
+                    />
+                    <Mui.FormControl margin="normal" style={{minWidth: 120}}>
                         <Mui.InputLabel htmlFor="reminder-recurrence">Recurrence</Mui.InputLabel>
                         <Mui.Select
                             inputProps={{name: 'recurrence', id: 'reminder-recurrence' }}
                             onChange={this.handleRecurrenceChange}
-                            value={this.state.recurrence.toString()}>
+                            value={this.state.addReminderRequest.recurrence.toString()}>
                             {occurrenceOptions}
                         </Mui.Select>
                     </Mui.FormControl>
@@ -92,7 +113,8 @@ class AddReminderModal extends React.Component<IAddReminderDialogComponentProps,
                     </Mui.Button>
                     <Mui.Button
                         color="primary"
-                        onClick={this.handleSave}>
+                        onClick={this.handleSave}
+                        disabled={!this.state.formValid}>
                         Save
                     </Mui.Button>
                 </Mui.DialogActions>
@@ -100,49 +122,74 @@ class AddReminderModal extends React.Component<IAddReminderDialogComponentProps,
         );
     }
 
+    private readonly validate = () => {
+
+        const newState = { ...this.state };
+
+        if (this.state.addReminderRequest.title.length === 0
+            || this.state.addReminderRequest.title.length > 64
+            || this.state.addReminderRequest.title === null
+            || this.state.addReminderRequest.title === undefined) {
+            newState.titleValid = false;
+            newState.titleErrorMessage = 'Required, 1-64 characters.';
+        } else {
+            newState.titleValid = true;
+            newState.titleErrorMessage = null;
+        }
+
+        if (this.state.addReminderRequest.forDate.length === 0) {
+            newState.forDateValid = false;
+            newState.forDateErrorMessage = 'Not a valid date.';
+        } else {
+            newState.forDateValid = true;
+            newState.forDateErrorMessage = null;
+        }
+
+        newState.formValid = newState.titleValid && newState.forDateValid;
+
+        this.setState(newState);
+    }
+
+    private readonly setAddReminderRequestState = (propName: string, value: string | number) => {
+        this.setState((state: IAddReminderDialogState) => {
+            const newReminderDetails = { ...state.addReminderRequest };
+            newReminderDetails[propName] = value;
+            return {
+                ...state,
+                addReminderRequest: newReminderDetails
+            };
+        }, this.validate);
+    }
+
     /**
      * Handle the form's 'title' field being changed by the user.
      */
-    private readonly handleTitleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
-        this.setState({
-            ...this.state,
-            title: evt.target.value || ''
-        });
+    private readonly handleTitleChange = (value: string, id: string) => {
+        this.setAddReminderRequestState('title', value || '');
     }
 
     /**
      * Handle the form's 'description' field being changed by the user.
      */
     private readonly handleDescriptionChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
-        this.setState({
-            ...this.state,
-            description: evt.target.value || ''
-        });
+        const newValue = evt.currentTarget.value;
+        this.setAddReminderRequestState('description', newValue || '');
     }
 
     /**
      * Handle the form's 'for date' selector being changed by the user.
      */
     private readonly handleDateChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
-
         const userMoment = moment.utc(evt.target.value, 'YYYY-MM-DD', true);
-
-        this.setState({
-            ...this.state,
-            forDate: userMoment.format()
-        });
+        this.setAddReminderRequestState('forDate', userMoment.format());
     }
 
     /**
      * Handle the form's 'recurrence' select being changed by the user.
      */
     private readonly handleRecurrenceChange = (evt: React.ChangeEvent<HTMLSelectElement>) => {
-        console.log(evt.target.value);
-        this.setState({
-            ...this.state,
-            recurrence: parseInt(evt.target.value, 10)
-        });
-        console.log(this.state.recurrence);
+        const newValue = parseInt(evt.target.value, 10);
+        this.setAddReminderRequestState('recurrence', newValue);
     }
 
     /**
@@ -150,13 +197,7 @@ class AddReminderModal extends React.Component<IAddReminderDialogComponentProps,
      * form data down to the onSave callback.
      */
     private readonly handleSave = () => {
-        this.props.onSave({
-            description: this.state.description,
-            forDate: this.state.forDate,
-            importance: this.state.importance,
-            recurrence: this.state.recurrence,
-            title: this.state.title
-        });
+        this.props.onSave(this.state.addReminderRequest);
     }
 }
 
