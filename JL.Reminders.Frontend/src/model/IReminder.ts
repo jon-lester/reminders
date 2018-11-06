@@ -1,6 +1,5 @@
 /**
- * Represents a reminder item pulled from the API for
- * display as a reminder card.
+ * Represents a reminder item pulled from the API.
  */
 export default interface IReminder {
     id: number;

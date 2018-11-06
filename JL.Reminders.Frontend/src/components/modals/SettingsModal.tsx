@@ -27,6 +27,11 @@ const styles = (theme: Mui.Theme) => createStyles({
     }
 });
 
+/**
+ * Render a modal dialog allowing the user to change global settings.
+ * Currently this includes the days-to-go values for 'soon', and 'imminent',
+ * which affect the rendering styles for Reminders in the UI.
+ */
 class SettingsModal extends React.Component<ISettingsModalProps & Mui.WithStyles<typeof styles>, ISettingsModalState> {
 
     constructor(props: ISettingsModalProps & Mui.WithStyles<typeof styles>) {
@@ -53,7 +58,7 @@ class SettingsModal extends React.Component<ISettingsModalProps & Mui.WithStyles
                         autoFocus={false}
                         defaultValue={this.props.urgencyConfiguration.soonDays.toString()}
                         errorMessage={this.state.soonDaysErrorMessage}
-                        onChange={this.handleChange}
+                        onChange={this.handleSoonDaysChange}
                         label="Display reminders as 'soon' when they are due within:"
                         valid={this.state.soonDaysValid}
                         endAdornment="days"
@@ -63,7 +68,7 @@ class SettingsModal extends React.Component<ISettingsModalProps & Mui.WithStyles
                         autoFocus={true}
                         defaultValue={this.props.urgencyConfiguration.imminentDays.toString()}
                         errorMessage={this.state.imminentDaysErrorMessage}
-                        onChange={this.handleChange}
+                        onChange={this.handleImminentDaysChange}
                         label="Display reminders as 'imminent' when they are due within:"
                         valid={this.state.imminentDaysValid}
                         endAdornment="days"
@@ -84,10 +89,19 @@ class SettingsModal extends React.Component<ISettingsModalProps & Mui.WithStyles
         );
     }
 
+    /**
+     * Return true iff the value is a valid integer between 1 and 365 inclusive.
+     */
     private readonly isValidDayRange = (value: number) => !isNaN(value) && Number.isInteger(value) && value > 0 && value <= 365;
 
+    /**
+     * Return true iff any aspect of the form's data is not valid.
+     */
     private readonly formIsInvalid = (): boolean => !this.state.imminentDaysValid || !this.state.soonDaysValid;
 
+    /**
+     * Validate the form, setting the validation properties on this.state accordingly.
+     */
     private readonly validate = () => {
 
         let imminentDaysValid = this.isValidDayRange(this.state.urgencyConfiguration.imminentDays);
@@ -111,28 +125,33 @@ class SettingsModal extends React.Component<ISettingsModalProps & Mui.WithStyles
         }));
     }
 
-    private readonly handleChange = (value: string, id: string) => {
-
-        switch (id) {
-            case 'imminent':
-                this.setState((state) => ({
-                    urgencyConfiguration: {
-                        ...state.urgencyConfiguration,
-                        imminentDays: Number(value)
-                    }
-                }), this.validate);
-                break;
-            case 'soon':
-            this.setState((state) => ({
-                urgencyConfiguration: {
-                    ...state.urgencyConfiguration,
-                    soonDays: Number(value)
-                }
-            }), this.validate);
-                break;
-        }
+    /**
+     * Handle the user having made a change to the 'soon' field.
+     */
+    private readonly handleSoonDaysChange = (value: string) => {
+        this.setState((state) => ({
+            urgencyConfiguration: {
+                ...state.urgencyConfiguration,
+                soonDays: Number(value)
+            }
+        }), this.validate);
     }
 
+    /**
+     * Handle the user having made a change to the 'imminent' field.
+     */
+    private readonly handleImminentDaysChange = (value: string) => {
+        this.setState((state) => ({
+            urgencyConfiguration: {
+                ...state.urgencyConfiguration,
+                imminentDays: Number(value)
+            }
+        }), this.validate);
+    }
+
+    /**
+     * Send the form's data to the onSave callback, if the data is valid.
+     */
     private readonly saveSettings = (event: React.MouseEvent<HTMLElement>) => {
         if (this.state.imminentDaysValid && this.state.soonDaysValid) {
             this.props.onSave({

@@ -16,7 +16,11 @@
     "noImplicitAny": true,
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    // next line needed for compatibility with material-ui-pickers\utils\moment-utils\index.d.ts
+    // (otherwise compiler will not accept "import defaultMoment from 'moment';" as valid)
+    // see also: https://momentjs.com/docs/#/use-it/typescript/
+    "allowSyntheticDefaultImports": true
   },
   "exclude": [
     "node_modules",

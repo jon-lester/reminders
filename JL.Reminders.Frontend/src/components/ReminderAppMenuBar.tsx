@@ -3,7 +3,7 @@ import { withStyles } from '@material-ui/core/styles';
 import MenuIcon from '@material-ui/icons/Menu';
 import * as React from 'react';
 
-import ReminderAppMenu from './ReminderAppMenu';
+import FloatingMenu from './FloatingMenu';
 
 import IMenuItem from '../model/IMenuItem';
 
@@ -76,7 +76,7 @@ class ReminderAppMenuBar extends React.Component<IReminderAppMenuBarProps, IRemi
                     )}
 
                 </Mui.Toolbar>
-                <ReminderAppMenu
+                <FloatingMenu
                     anchorEl={this.state.anchorEl}
                     menuItems={this.props.menuItems}
                     open={this.state.menuOpen}

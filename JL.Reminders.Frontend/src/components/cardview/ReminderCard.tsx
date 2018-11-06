@@ -5,14 +5,14 @@ import blue from '@material-ui/core/colors/blue';
 import orange from '@material-ui/core/colors/orange';
 import red from '@material-ui/core/colors/red';
 import yellow from '@material-ui/core/colors/yellow';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 import { createStyles, withStyles } from '@material-ui/core/styles';
-import MoreVertIcon from '@material-ui/icons/MoreVert'
 
 import IMenuItem from '../../model/IMenuItem';
 import IReminder from '../../model/IReminder';
 import Urgency from '../../model/Urgency';
-import ReminderAppMenu from '../ReminderAppMenu';
+import FloatingMenu from '../FloatingMenu';
 import ReminderCardDays from './ReminderCardDays';
 
 const styles = () => {
@@ -29,7 +29,7 @@ const styles = () => {
         },
         cardNow: {
             ...card,
-            backgroundColor: blue[50] // 'rgba(0, 0, 255, 0.1)'
+            backgroundColor: blue[50]
         },
         cardOverdue: {
             ...card,
@@ -48,7 +48,6 @@ interface IReminderCardProps extends Mui.WithStyles<typeof styles> {
     onMarkArchived?: (reminder: IReminder) => void;
     reminder: IReminder;
     soonDays: number;
-
 }
 
 interface IReminderCardState {
@@ -56,6 +55,9 @@ interface IReminderCardState {
     menuOpen: boolean;
 }
 
+/**
+ * Render a single reminder as a Material-UI Card.
+ */
 class ReminderCard extends React.Component<IReminderCardProps & Mui.WithStyles<typeof styles>, IReminderCardState> {
 
     private menuItems : IMenuItem[];
@@ -102,11 +104,34 @@ class ReminderCard extends React.Component<IReminderCardProps & Mui.WithStyles<t
                     />
                 </Mui.CardContent>
             </Mui.Card>
-            <ReminderAppMenu open={this.state.menuOpen} onClosed={this.handleMenuClosed} menuItems={this.menuItems} anchorEl={this.state.menuElement} />
+            <FloatingMenu
+                open={this.state.menuOpen}
+                onClosed={this.handleMenuClosed}
+                menuItems={this.menuItems}
+                anchorEl={this.state.menuElement}
+            />
             </div>
         );
     }
 
+    /**
+     * Get the CSS class of the card based on its Urgency.
+     */
+    private readonly getCardClass = (): string => {
+        switch (this.getUrgency()) {
+            case Urgency.Imminent: return this.props.classes.cardImminent;
+            case Urgency.Now: return this.props.classes.cardNow;
+            case Urgency.Soon: return this.props.classes.cardSoon;
+            case Urgency.Overdue: return this.props.classes.cardOverdue;
+            default: return this.props.classes.card;
+        }
+    }
+
+    /**
+     * Get the Urgency of this reminder by examining the value
+     * of daysToGo in combination with the user's settings for
+     * 'soon' and 'imminent'.
+     */
     private readonly getUrgency = (): Urgency => {
         if (this.props.reminder.daysToGo < 0) {
             return Urgency.Overdue;
@@ -127,30 +152,13 @@ class ReminderCard extends React.Component<IReminderCardProps & Mui.WithStyles<t
         return Urgency.Normal;
     }
 
-    private readonly getCardClass = (): string => {
-        switch (this.getUrgency()) {
-            case Urgency.Imminent: return this.props.classes.cardImminent;
-            case Urgency.Now: return this.props.classes.cardNow;
-            case Urgency.Soon: return this.props.classes.cardSoon;
-            case Urgency.Overdue: return this.props.classes.cardOverdue;
-            default: return this.props.classes.card;
-        }
-    }
-
+    /**
+     * Do any formatting transforms needed for final render of the
+     * IReminder data on the card.
+     */
     private readonly getFormattedReminderProp = (): IReminder => {
         return {
-            created: this.props.reminder.created,
-            daysToGo: this.props.reminder.daysToGo,
-            description: this.props.reminder.description,
-            forDate: this.props.reminder.forDate,
-            id: this.props.reminder.id,
-            imminentDaysPreference: this.props.reminder.imminentDaysPreference,
-            importance: this.props.reminder.importance,
-            lastActioned: this.props.reminder.lastActioned,
-            nextDueDate: this.props.reminder.nextDueDate,
-            recurrence: this.props.reminder.recurrence,
-            soonDaysPreference: this.props.reminder.soonDaysPreference,
-            subTitle: this.props.reminder.subTitle,
+            ...this.props.reminder,
             title: this.props.reminder.title
                 ? (this.props.reminder.title.length > 16
                     ? this.props.reminder.title.substr(0, 14) + '..'
@@ -160,9 +168,9 @@ class ReminderCard extends React.Component<IReminderCardProps & Mui.WithStyles<t
     }
 
     /**
-     * Handle the vert-icon button being clicked to open the card's menu.
+     * Handle the card's menu button being clicked, opening the card's menu.
      */
-    private readonly handleMenuOpen = (evt: React.SyntheticEvent<HTMLElement>) => {
+    private readonly handleMenuOpen = (evt: React.MouseEvent<HTMLButtonElement>) => {
         this.setState({
             ...this.state,
             menuElement: evt.currentTarget,

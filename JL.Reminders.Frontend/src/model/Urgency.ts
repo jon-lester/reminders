@@ -1,3 +1,6 @@
+/**
+ * Represents the urgency of a given reminder.
+ */
 enum Urgency {
     Normal = 0,
     Soon = 1,

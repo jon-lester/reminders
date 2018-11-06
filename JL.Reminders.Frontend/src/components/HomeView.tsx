@@ -3,9 +3,9 @@ import { createStyles, withStyles } from '@material-ui/core/styles';
 import * as React from 'react';
 import { Redirect } from 'react-router';
 
-import ViewWrapper from './ViewWrapper';
-
 import { withAuthService, WithAuthServiceProps } from '../services/AuthService';
+
+import ViewWrapper from './ViewWrapper';
 
 const styles = () => createStyles({
     homePaper: {
@@ -20,6 +20,10 @@ const styles = () => createStyles({
     }
 });
 
+/**
+ * Render a view that shows the user some explanation of what they're looking
+ * at before they're authenticated and logged in.
+ */
 class HomeView extends React.PureComponent<Mui.WithStyles<typeof styles> & WithAuthServiceProps> {
     public render() {
         return (

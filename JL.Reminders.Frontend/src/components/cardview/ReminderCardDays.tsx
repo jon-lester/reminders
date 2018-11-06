@@ -1,11 +1,12 @@
+import * as Mui from '@material-ui/core';
+import * as React from 'react';
+
 import blue from '@material-ui/core/colors/blue';
 import orange from '@material-ui/core/colors/orange';
 import red from '@material-ui/core/colors/red';
 import yellow from '@material-ui/core/colors/yellow';
 
-import * as Mui from '@material-ui/core';
 import { createStyles, withStyles } from '@material-ui/core/styles';
-import * as React from 'react';
 
 import Urgency from '../../model/Urgency';
 
@@ -22,7 +23,7 @@ const styles = () => createStyles({
         color: red[400]
     },
     timeSoon: {
-        color: yellow[400]
+        color: yellow[400] // dubious.. kind of hard to read.. needs something different
     }
 });
 
@@ -31,6 +32,9 @@ interface IReminderCardDaysProps extends Mui.WithStyles<typeof styles> {
     urgency: Urgency;
 }
 
+/**
+ * Render the large formatted Days To Go value used in the centre of a ReminderCard.
+ */
 class ReminderCardDays extends React.PureComponent<IReminderCardDaysProps> {
     public render() {
         return (
@@ -44,7 +48,6 @@ class ReminderCardDays extends React.PureComponent<IReminderCardDaysProps> {
     }
 
     private readonly getClass = (): string => {
-        
         switch (this.props.urgency) {
             case Urgency.Imminent: return this.props.classes.timeImminent;
             case Urgency.Now: return this.props.classes.timeNow;

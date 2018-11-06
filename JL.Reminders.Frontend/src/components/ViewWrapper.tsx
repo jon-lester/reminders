@@ -9,6 +9,10 @@ const styles = () => createStyles({
     }
 });
 
+/**
+ * Wraps a view with appropriate margin and padding to be placed
+ * in the app's main view area.
+ */
 class ViewWrapper extends React.PureComponent<WithStyles<typeof styles>> {
     public render() {
         return (

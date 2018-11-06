@@ -12,11 +12,15 @@ const styles = () => createStyles({
     }
 });
 
-interface IReminderFABProps extends Mui.WithStyles<typeof styles> {
+interface IAddReminderFABProps extends Mui.WithStyles<typeof styles> {
     onAddReminder?: () => void;
 }
 
-class ReminderFAB extends React.PureComponent<IReminderFABProps> {
+/**
+ * Render a Floating Action Button allowing the user to add a new reminder
+ * in a fixed position at bottom-right of the UI.
+ */
+class AddReminderFAB extends React.PureComponent<IAddReminderFABProps> {
     public render() {
         return (
             <Mui.Tooltip
@@ -41,4 +45,4 @@ class ReminderFAB extends React.PureComponent<IReminderFABProps> {
     }
 }
 
-export default withStyles(styles)(ReminderFAB);
+export default withStyles(styles)(AddReminderFAB);

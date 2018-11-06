@@ -1,12 +1,13 @@
 import * as Mui from '@material-ui/core';
-import * as moment from 'moment';
+import { InlineDatePicker } from 'material-ui-pickers';
+import moment, { Moment } from 'moment';
 import * as React from 'react';
 
 import IAddReminderRequest from '../../model/IAddReminderRequest';
 import IOptions from '../../model/Options';
 import TextInputControl from './TextInputControl';
 
-interface IAddReminderDialogProps {
+interface IAddReminderModalProps {
     open: boolean;
     occurrenceOptions: IOptions;
     importanceOptions: IOptions;
@@ -14,16 +15,18 @@ interface IAddReminderDialogProps {
     onSave(addReminderRequest: IAddReminderRequest): void;
 }
 
-interface IAddReminderDialogState {
+interface IAddReminderModalState {
     addReminderRequest: IAddReminderRequest;
-    forDateErrorMessage: string | null;
-    forDateValid: boolean;
     formValid: boolean;
     titleErrorMessage: string | null;
     titleValid: boolean;
 }
 
-class AddReminderModal extends React.Component<IAddReminderDialogProps, IAddReminderDialogState> {
+/**
+ * Render a modal dialog to accept data from the user to be used to
+ * create a new Reminder.
+ */
+class AddReminderModal extends React.Component<IAddReminderModalProps, IAddReminderModalState> {
 
     constructor(props: any) {
         super(props);
@@ -36,11 +39,9 @@ class AddReminderModal extends React.Component<IAddReminderDialogProps, IAddRemi
                 recurrence: 0,
                 title: ''
             },
-            forDateErrorMessage: null,
-            forDateValid: true,
             formValid: false,
             titleErrorMessage: null,
-            titleValid: true,
+            titleValid: true
         };
     }
 
@@ -85,14 +86,11 @@ class AddReminderModal extends React.Component<IAddReminderDialogProps, IAddRemi
                         fullWidth={true}
                         margin="normal"
                     />
-                    <Mui.TextField
-                        id="reminder-fordate"
-                        onChange={this.handleDateChange}
-                        defaultValue={moment().format('YYYY-MM-DD')}
-                        label="For Date"
+                    <InlineDatePicker
+                        label='Next due date'
+                        value={this.state.addReminderRequest.forDate}
+                        onChange={this.handleDatePickerChange}
                         fullWidth={true}
-                        InputLabelProps={{shrink: true}}
-                        type="date"
                         margin="normal"
                     />
                     <Mui.FormControl margin="normal" style={{minWidth: 120}}>
@@ -122,6 +120,10 @@ class AddReminderModal extends React.Component<IAddReminderDialogProps, IAddRemi
         );
     }
 
+    /**
+     * Validate the form data, setting the formValid property
+     * in this.state accordingly.
+     */
     private readonly validate = () => {
 
         const newState = { ...this.state };
@@ -137,21 +139,17 @@ class AddReminderModal extends React.Component<IAddReminderDialogProps, IAddRemi
             newState.titleErrorMessage = null;
         }
 
-        if (this.state.addReminderRequest.forDate.length === 0) {
-            newState.forDateValid = false;
-            newState.forDateErrorMessage = 'Not a valid date.';
-        } else {
-            newState.forDateValid = true;
-            newState.forDateErrorMessage = null;
-        }
-
-        newState.formValid = newState.titleValid && newState.forDateValid;
+        newState.formValid = newState.titleValid;
 
         this.setState(newState);
     }
 
-    private readonly setAddReminderRequestState = (propName: string, value: string | number) => {
-        this.setState((state: IAddReminderDialogState) => {
+    /**
+     * Set a property of this.state's IAddReminderRequest
+     * to the given value, then trigger a validation check.
+     */
+    private readonly setAddReminderRequestState = (propName: keyof IAddReminderRequest, value: string | number) => {
+        this.setState((state: IAddReminderModalState) => {
             const newReminderDetails = { ...state.addReminderRequest };
             newReminderDetails[propName] = value;
             return {
@@ -177,11 +175,10 @@ class AddReminderModal extends React.Component<IAddReminderDialogProps, IAddRemi
     }
 
     /**
-     * Handle the form's 'for date' selector being changed by the user.
+     * Handle the form's 'next due date' selector being changed by the user.
      */
-    private readonly handleDateChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
-        const userMoment = moment.utc(evt.target.value, 'YYYY-MM-DD', true);
-        this.setAddReminderRequestState('forDate', userMoment.format());
+    private readonly handleDatePickerChange = (date: Moment) => {
+        this.setAddReminderRequestState('forDate', date.format());
     }
 
     /**
@@ -193,11 +190,13 @@ class AddReminderModal extends React.Component<IAddReminderDialogProps, IAddRemi
     }
 
     /**
-     * Handle the user having clicked the save button; pass the
+     * Handle the user having clicked the save button by passing the
      * form data down to the onSave callback.
      */
     private readonly handleSave = () => {
-        this.props.onSave(this.state.addReminderRequest);
+        if (this.state.formValid) {
+            this.props.onSave(this.state.addReminderRequest);
+        }
     }
 }
 

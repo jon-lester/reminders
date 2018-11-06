@@ -3,16 +3,20 @@ import * as React from 'react';
 
 import IMenuItem from '../model/IMenuItem';
 
-interface IReminderAppMenuProps {
+interface IFloatingMenuProps {
     anchorEl: HTMLElement | undefined, 
     menuItems: IMenuItem[],
     onClosed: () => void,
     open: boolean
 };
 
-class ReminderAppMenu extends React.Component<IReminderAppMenuProps> {
+/**
+ * Render a floating menu anchored to a given element to be used
+ * as a drop-down / pop-up. (See IMenuItem.)
+ */
+class FloatingMenu extends React.Component<IFloatingMenuProps> {
 
-    constructor(props: IReminderAppMenuProps) {
+    constructor(props: IFloatingMenuProps) {
         super(props);
     }
 
@@ -44,14 +48,13 @@ class ReminderAppMenu extends React.Component<IReminderAppMenuProps> {
     }
 
     /**
-     * Handle one of the menu items being clicked - run its
+     * Handle one of the menu items having been clicked - run its
      * action then close the menu.
      */
     private readonly handleMenuItemClick = (menuActionFunction: () => void) => (evt: any)  => {
         menuActionFunction();
-        // close the menu after calling the action
         this.props.onClosed();
     }
 }
 
-export default ReminderAppMenu;
+export default FloatingMenu;

@@ -1,4 +1,6 @@
 import CssBaseline from '@material-ui/core/CssBaseline';
+import { MuiPickersUtilsProvider } from 'material-ui-pickers';
+import MomentUtils from 'material-ui-pickers/utils/moment-utils';
 import * as React from 'react';
 import { Route, Switch } from 'react-router-dom';
 
@@ -40,7 +42,7 @@ class App extends React.Component<WithAuthServiceProps, IAppState> {
 
     public render() {
         return (
-            <>
+            <MuiPickersUtilsProvider utils={MomentUtils}>
                 <CssBaseline />
                 <ReminderAppMenuBar
                     menuItems={this.state.menuItems}
@@ -61,7 +63,7 @@ class App extends React.Component<WithAuthServiceProps, IAppState> {
                     open={this.state.aboutModalOpen}
                     onClose={this.handleAboutModalClosed}
                 />
-            </>
+            </MuiPickersUtilsProvider>
         );
     }
 
@@ -75,6 +77,11 @@ class App extends React.Component<WithAuthServiceProps, IAppState> {
         });
     }
 
+    /**
+     * Configure the app's top-left menu dropdown to contain any
+     * passed-in menu items, additionally appending the 'About' item
+     * as the last entry.
+     */
     private readonly configureMenu = (menuItems: IMenuItem[]) => {
         this.setState({
             menuItems: [...menuItems, this.aboutMenuItem]

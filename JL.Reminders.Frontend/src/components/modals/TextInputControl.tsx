@@ -23,8 +23,18 @@ const styles = () => createStyles({
     }
 });
 
+/**
+ * Render a form text field with consistent styling for the Reminders app (particularly
+ * in relation to validation messages being displayed in the right place, etc).
+ * 
+ * If the valid prop is set false, but an an error message is not provided, the field
+ * will used the default message at TextInputControl.defaultErrorMessage.
+ */
 class TextInputControl extends React.Component<ITextInputControlProps & Mui.WithStyles<typeof styles>> {
-    
+
+    // be clear that this must not be null or undefined
+    public static defaultErrorMessage: string = 'Error';
+
     constructor(props: ITextInputControlProps & Mui.WithStyles<typeof styles>) {
         super(props);
     }
@@ -54,7 +64,7 @@ class TextInputControl extends React.Component<ITextInputControlProps & Mui.With
                     <Mui.FormHelperText
                         id={this.props.id + "-helper-text"}
                         className={this.props.classes.formHelperErrorText}>
-                        {this.props.errorMessage || 'Error'}
+                        {this.props.errorMessage || TextInputControl.defaultErrorMessage}
                     </Mui.FormHelperText>}
             </Mui.FormControl>
         );

@@ -6,6 +6,9 @@ interface IAboutModalProps {
     onClose: () => void;
 }
 
+/**
+ * Render a modal dialog to display version/author info.
+ */
 class AboutModal extends React.PureComponent<IAboutModalProps> {
     public render() {
         return (

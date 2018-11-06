@@ -11,7 +11,7 @@ import AddReminderModal from './modals/AddReminderModal';
 import SettingsModal from './modals/SettingsModal';
 import ViewWrapper from './ViewWrapper';
 
-import AppState from '../model/AppState';
+import AppLoadState from '../model/AppLoadState';
 import IAddReminderRequest from '../model/IAddReminderRequest';
 import IMenuItem from '../model/IMenuItem';
 import IReminder from '../model/IReminder';
@@ -21,7 +21,7 @@ import IUserPreferences from '../model/IUserPreferences';
 
 interface IReminderAppState {
     addReminderModalOpen: boolean;
-    appState: AppState;
+    appState: AppLoadState;
     reminders: IReminder[];
     reminderOptions: IReminderOptions;
     settingsModalOpen: boolean;
@@ -40,7 +40,7 @@ class ReminderApp extends React.Component<WithApiServiceProps<IReminderAppProps>
         super(props as any);
         this.state = {
             addReminderModalOpen: false,
-            appState: AppState.Loading,
+            appState: AppLoadState.Loading,
             reminderOptions: {
                 importances: {},
                 recurrences: {}
@@ -71,10 +71,10 @@ class ReminderApp extends React.Component<WithApiServiceProps<IReminderAppProps>
 
         let view;
         switch (this.state.appState) {
-            case AppState.Loading:
+            case AppLoadState.Loading:
                 view = <LoadingView />
                 break;
-            case AppState.Loaded:
+            case AppLoadState.Loaded:
                 view = <ReminderCardView
                             reminders={this.state.reminders}
                             onMarkActioned={this.handleMarkActioned}
@@ -84,7 +84,7 @@ class ReminderApp extends React.Component<WithApiServiceProps<IReminderAppProps>
                             soonDays={this.state.userSettings.urgencyConfiguration.soonDays}
                         />
                 break;
-            case AppState.Error:
+            case AppLoadState.Error:
                 view = <ErrorView />
         }
 
@@ -132,7 +132,7 @@ class ReminderApp extends React.Component<WithApiServiceProps<IReminderAppProps>
         .then(results => {
             this.setState({
                 ...this.state,
-                appState: AppState.Loaded,
+                appState: AppLoadState.Loaded,
                 reminderOptions: results[0],
                 reminders: results[2].sort((a, b) => a.daysToGo - b.daysToGo),
                 userSettings: results[1]
@@ -142,7 +142,7 @@ class ReminderApp extends React.Component<WithApiServiceProps<IReminderAppProps>
             console.log(reason);
             this.setState({
                 ...this.state,
-                appState: AppState.Error
+                appState: AppLoadState.Error
             });
         });
 
@@ -153,7 +153,7 @@ class ReminderApp extends React.Component<WithApiServiceProps<IReminderAppProps>
             .then(results => {
                 this.setState({
                     ...this.state,
-                    appState: AppState.Loaded,
+                    appState: AppLoadState.Loaded,
                     reminderOptions: results[0],
                     reminders: results[1].sort((a, b) => a.daysToGo - b.daysToGo)
                 });
@@ -163,11 +163,9 @@ class ReminderApp extends React.Component<WithApiServiceProps<IReminderAppProps>
                 console.log(reason);
                 this.setState({
                     ...this.state,
-                    appState: AppState.Error
+                    appState: AppLoadState.Error
                 });
             });
-
-        // this.refreshAllReminders();
     }
 
     private readonly refreshAllReminders = () => {
@@ -219,6 +217,9 @@ class ReminderApp extends React.Component<WithApiServiceProps<IReminderAppProps>
         this.handleAddReminderModalClosed();
     }
 
+    /**
+     * Handle the user having requested to save their global settings.
+     */
     private readonly handleSettingsModalSave = (urgencyConfiguration: IUrgencyConfiguration) => {
         this.props.api.onSaveUserSettings({ urgencyConfiguration })
             .then(result => {
@@ -229,6 +230,9 @@ class ReminderApp extends React.Component<WithApiServiceProps<IReminderAppProps>
             });
     }
 
+    /**
+     * Handle the user having cancelled the settings dialog.
+     */
     private readonly handleSettingsModalCancel = () => {
         this.setState({
             settingsModalOpen: false
