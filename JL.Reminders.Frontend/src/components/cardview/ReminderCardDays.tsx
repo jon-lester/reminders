@@ -10,22 +10,34 @@ import { createStyles, withStyles } from '@material-ui/core/styles';
 
 import Urgency from '../../model/Urgency';
 
-const styles = () => createStyles({
-    time: {
-    },
-    timeImminent: {
-        color: orange[400]
-    },
-    timeNow: {
-        color: blue[400]
-    },
-    timeOverdue: {
-        color: red[400]
-    },
-    timeSoon: {
-        color: yellow[400] // dubious.. kind of hard to read.. needs something different
-    }
-});
+const styles = () => {
+
+    const time = {
+        color: 'rgba(0, 0, 0, 0.54)',
+        fontSize: '7rem'
+    };
+
+    return createStyles({
+        time,
+        timeImminent: {
+            ...time,
+            color: orange[400]
+        },
+        timeNow: {
+            ...time,
+            color: blue[400]
+        },
+        timeOverdue: {
+            ...time,
+            color: red[400]
+        },
+        timeSoon: {
+            ...time,
+            color: yellow[400] // dubious.. kind of hard to read.. needs something different
+        }
+    });
+}
+
 
 interface IReminderCardDaysProps extends Mui.WithStyles<typeof styles> {
     days: number;
@@ -41,7 +53,7 @@ class ReminderCardDays extends React.PureComponent<IReminderCardDaysProps> {
             <Mui.Typography
                 className = {this.getClass()}
                 align = "center"
-                variant = "display4">
+                variant = "h1">
                 {this.props.days}
             </Mui.Typography>
         )
