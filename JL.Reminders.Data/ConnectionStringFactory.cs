@@ -11,7 +11,7 @@ namespace JL.Reminders.Data
 	    {
 		    MySqlConnectionStringBuilder builder = new MySqlConnectionStringBuilder
 		    {
-			    SslMode = MySqlSslMode.None,
+			    SslMode = MySqlSslMode.Required,
 			    Server = Environment.GetEnvironmentVariable("REMINDERS_MYSQL_SERVER"),
 			    UserID = Environment.GetEnvironmentVariable("REMINDERS_MYSQL_USER"),
 			    Password = Environment.GetEnvironmentVariable("REMINDERS_MYSQL_PASSWORD"),

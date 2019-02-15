@@ -11,8 +11,6 @@ using AutoMapper;
 using Swashbuckle.AspNetCore.Swagger;
 using FluentValidation.AspNetCore;
 using JL.Reminders.Api.Automapper;
-using JL.Reminders.Api.Models;
-using JL.Reminders.Core.Model;
 using JL.Reminders.Services.Automapper;
 
 namespace JL.Reminders.Api
