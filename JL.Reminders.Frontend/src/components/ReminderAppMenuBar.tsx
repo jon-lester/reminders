@@ -57,7 +57,7 @@ class ReminderAppMenuBar extends React.Component<IReminderAppMenuBarProps, IRemi
                     </Mui.IconButton>
                     <Mui.Typography
                         className={this.props.classes.flex}
-                        variant="title"
+                        variant="h6"
                         color="inherit">
                         Reminders
                     </Mui.Typography>

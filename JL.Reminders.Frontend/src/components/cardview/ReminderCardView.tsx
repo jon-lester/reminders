@@ -65,12 +65,12 @@ class ReminderCardView extends React.Component<IReminderCardViewProps> {
                 ) : (<>
                         <Mui.Typography
                             align="center"
-                            variant="display1">
+                            variant="h4">
                             You have no reminders!
                         </Mui.Typography>
                         <Mui.Typography
                             align="center"
-                            variant="display1">
+                            variant="h4">
                             Click the <AddIcon className={this.props.classes.addIcon} /> button to get started.
                         </Mui.Typography>
                     </>

@@ -30,11 +30,11 @@ class HomeView extends React.PureComponent<Mui.WithStyles<typeof styles> & WithA
             !this.props.auth.onCheckAuthenticated() ? (
             <ViewWrapper>
                 <Mui.Paper className={this.props.classes.homePaper}>
-                    <Mui.Typography variant="display3">
+                    <Mui.Typography variant="h2">
                         Reminders
                     </Mui.Typography>
                     <hr />
-                    <Mui.Typography variant="caption">
+                    <Mui.Typography variant="subtitle1">
                         Version {process.env.REACT_APP_VERSION}
                     </Mui.Typography>
                 </Mui.Paper>

@@ -33,13 +33,12 @@ class ErrorView extends React.PureComponent<WithStyles<typeof styles>> {
                 </Mui.Grid>
                 <Mui.Grid item={true}>
                     <Mui.Typography
-                        variant="display1">
+                        variant="h4">
                         Server Error!
                     </Mui.Typography>
                 </Mui.Grid>
                 <Mui.Grid item={true}>
-                    <Mui.Typography
-                        variant="body1">
+                    <Mui.Typography>
                         Sorry - something went wrong. Your reminders are safe,
                         but the server isn't responding right now. Please try
                         again later.
